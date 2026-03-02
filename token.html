@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Preceptor - Token Dinâmico</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Rajdhani:wght@500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #05080A;
+            --card: #0F1923;
+            --border: #1C2E3D;
+            --text: #D8EAF5;
+            /* Cores por período */
+            --c5: #00C2FF; /* Azul */
+            --c6: #00D48A; /* Verde */
+            --c7: #FFB800; /* Âmbar */
+            --c8: #9B6FFF; /* Roxo */
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Rajdhani', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Efeito de grade no fundo */
+        body::before {
+            content: '';
+            position: fixed; inset: 0;
+            background-image: linear-gradient(rgba(28, 46, 61, 0.1) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(28, 46, 61, 0.1) 1px, transparent 1px);
+            background-size: 30px 30px;
+            z-index: -1;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 400px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        }
+
+        .header {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--muted);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .period-selector {
+            margin-bottom: 25px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .btn-p {
+            background: #141F2A;
+            border: 1px solid var(--border);
+            color: #5A7A90;
+            padding: 10px 0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .btn-p.active[data-p="5"] { border-color: var(--c5); color: var(--c5); box-shadow: 0 0 15px rgba(0,194,255,0.3); }
+        .btn-p.active[data-p="6"] { border-color: var(--c6); color: var(--c6); box-shadow: 0 0 15px rgba(0,212,138,0.3); }
+        .btn-p.active[data-p="7"] { border-color: var(--c7); color: var(--c7); box-shadow: 0 0 15px rgba(255,184,0,0.3); }
+        .btn-p.active[data-p="8"] { border-color: var(--c8); color: var(--c8); box-shadow: 0 0 15px rgba(155,111,255,0.3); }
+
+        .token-box {
+            background: rgba(0,0,0,0.3);
+            border-radius: 15px;
+            padding: 40px 20px;
+            margin: 20px 0;
+            border: 1px dashed var(--border);
+        }
+
+        .token-label {
+            font-size: 14px;
+            color: #5A7A90;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        #token-display {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 42px;
+            font-weight: bold;
+            letter-spacing: 5px;
+            transition: color 0.5s;
+        }
+
+        .timer-container {
+            margin-top: 20px;
+            height: 4px;
+            background: #1C2E3D;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        #timer-bar {
+            height: 100%;
+            width: 100%;
+            background: var(--c5);
+            transition: width 1s linear, background 0.5s;
+        }
+
+        .footer-info {
+            margin-top: 20px;
+            font-size: 13px;
+            color: #5A7A90;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <span>Sistema de Validação</span>
+        <span id="status-dot">● LIVE</span>
+    </div>
+
+    <div class="token-label">Selecione o Período</div>
+    <div class="period-selector">
+        <button class="btn-p active" data-p="5">5º</button>
+        <button class="btn-p" data-p="6">6º</button>
+        <button class="btn-p" data-p="7">7º</button>
+        <button class="btn-p" data-p="8">8º</button>
+    </div>
+
+    <div class="token-box">
+        <div class="token-label">Código de Autenticação</div>
+        <div id="token-display">--- ---</div>
+        
+        <div class="timer-container">
+            <div id="timer-bar"></div>
+        </div>
+        <div id="timer-text" style="font-size: 12px; margin-top: 10px; color: #5A7A90;">Atualizando em: 05:00</div>
+    </div>
+
+    <div class="footer-info">
+        Dite o código acima para os alunos.<br>
+        O código expira automaticamente.
+    </div>
+</div>
+
+<script>
+    let periodoAtual = "5";
+    const tempoCiclo = 300; // 5 minutos em segundos
+
+    // Função para gerar o Token baseado no tempo e período
+    function gerarToken(periodo) {
+        const agora = Math.floor(Date.now() / (tempoCiclo * 1000));
+        const saca = "MED-ESTAGIO-" + periodo + "-" + agora;
+        
+        // Simulação de Hash simples para gerar 6 caracteres alfanuméricos
+        let hash = 0;
+        for (let i = 0; i < saca.length; i++) {
+            hash = ((hash << 5) - hash) + saca.charCodeAt(i);
+            hash |= 0;
+        }
+        
+        const stringBase = Math.abs(hash).toString(36).toUpperCase();
+        const token = (stringBase + "ABC123").substring(0, 6);
+        return token.substring(0, 3) + " " + token.substring(3, 6);
+    }
+
+    function atualizarInterface() {
+        const display = document.getElementById('token-display');
+        const bar = document.getElementById('timer-bar');
+        const timerText = document.getElementById('timer-text');
+        
+        const agoraMs = Date.now();
+        const restoSegundos = tempoCiclo - (Math.floor(agoraMs / 1000) % tempoCiclo);
+        
+        // Atualiza o Token
+        display.textContent = gerarToken(periodoAtual);
+        
+        // Atualiza a Barra e Cores
+        const cores = { "5": "#00C2FF", "6": "#00D48A", "7": "#FFB800", "8": "#9B6FFF" };
+        const corAtiva = cores[periodoAtual];
+        
+        display.style.color = corAtiva;
+        bar.style.backgroundColor = corAtiva;
+        
+        // Atualiza a barra de progresso
+        const porcentagem = (restoSegundos / tempoCiclo) * 100;
+        bar.style.width = porcentagem + "%";
+        
+        // Atualiza o texto do cronômetro
+        const min = Math.floor(restoSegundos / 60);
+        const seg = restoSegundos % 60;
+        timerText.textContent = `Atualizando em: ${min.toString().padStart(2, '0')}:${seg.toString().padStart(2, '0')}`;
+    }
+
+    // Eventos dos botões de período
+    document.querySelectorAll('.btn-p').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.btn-p').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            periodoAtual = btn.getAttribute('data-p');
+            atualizarInterface();
+        });
+    });
+
+    setInterval(atualizarInterface, 1000);
+    atualizarInterface();
+</script>
+
+</body>
+</html>
