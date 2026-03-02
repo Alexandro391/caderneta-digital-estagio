@@ -10,26 +10,22 @@
       --verde: #00C896; --verde-escuro: #00A878; --azul: #0090FF; --amarelo: #FFD60A; --roxo: #9B6FFF;
       --fundo: #0A0F0D; --superficie: #111A15; --superficie2: #162019; --borda: #1E3028;
       --texto: #E8F5EE; --texto-suave: #7AAB8A; --mono: 'Space Mono', monospace; --sans: 'DM Sans', sans-serif;
-      --cor-periodo: var(--verde); /* Dinâmico */
+      --cor-periodo: var(--verde);
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { background: var(--fundo); color: var(--texto); font-family: var(--sans); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 0 0 60px; overflow-x: hidden; }
     body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(0,200,150,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,200,150,0.03) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; }
-
     header { width: 100%; max-width: 520px; padding: 36px 24px 0; position: relative; z-index: 1; animation: fadeDown 0.6s ease both; }
     .badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(0,200,150,0.1); border: 1px solid rgba(0,200,150,0.25); border-radius: 100px; padding: 4px 12px; font-family: var(--mono); font-size: 10px; color: var(--cor-periodo); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
     h1 { font-family: var(--mono); font-size: clamp(22px, 6vw, 28px); font-weight: 700; color: var(--texto); line-height: 1.2; }
     h1 span { color: var(--cor-periodo); }
     .subtitulo { font-size: 13px; color: var(--texto-suave); margin-top: 6px; }
-
     .card-aluno { width: calc(100% - 48px); max-width: 520px; margin: 28px 0 0; padding: 20px 22px; background: var(--superficie); border: 1px solid var(--borda); border-radius: 16px; position: relative; z-index: 1; animation: fadeUp 0.6s 0.1s ease both; }
     .card-aluno::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--cor-periodo); }
     .aluno-info { display: flex; align-items: center; gap: 14px; }
     .avatar { width: 48px; height: 48px; background: var(--cor-periodo); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 18px; color: #000; font-weight: 700; transition: 0.3s; }
     .aluno-nome { font-size: 17px; font-weight: 600; color: var(--texto); }
     .aluno-ra { font-family: var(--mono); font-size: 12px; color: var(--cor-periodo); margin-top: 3px; }
-
     form { width: 100%; max-width: 520px; padding: 0 24px; position: relative; z-index: 1; animation: fadeUp 0.6s 0.2s ease both; }
     .secao { margin-top: 28px; }
     .secao-titulo { font-family: var(--mono); font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--texto-suave); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
@@ -37,17 +33,13 @@
     .campo { margin-bottom: 14px; }
     label { display: block; font-size: 11px; font-weight: 600; color: var(--texto-suave); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 7px; }
     input, select { width: 100%; background: var(--superficie2); border: 1px solid var(--borda); border-radius: 10px; padding: 13px 16px; color: var(--texto); font-family: var(--sans); font-size: 15px; outline: none; }
-    input:read-only { opacity: 0.6; cursor: not-allowed; }
-
     .btn-registrar { width: 100%; background: var(--cor-periodo); color: #000; border: none; border-radius: 12px; padding: 17px; font-family: var(--mono); font-size: 14px; font-weight: 700; text-transform: uppercase; cursor: pointer; margin-top: 28px; transition: 0.3s; }
     .btn-registrar:disabled { opacity: 0.5; filter: grayscale(1); }
-
     .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 100; display: none; align-items: center; justify-content: center; padding: 24px; }
     .overlay.ativo { display: flex; }
     .modal { background: var(--superficie); border-radius: 24px; padding: 40px 32px; max-width: 340px; text-align: center; border: 1px solid var(--borda); }
     .erro-msg { color: #FF8080; font-size: 12px; margin-top: 10px; font-family: var(--mono); display: none; }
     .erro-msg.visivel { display: block; }
-
     @keyframes fadeDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
     @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
   </style>
@@ -64,7 +56,7 @@
     <div class="aluno-info">
       <div class="avatar" id="avatarLetra">?</div>
       <div>
-        <div class="aluno-nome" id="nomeAluno">Identifique-se via QR Code</div>
+        <div class="aluno-nome" id="nomeAluno">Carregando...</div>
         <div class="aluno-ra" id="raAluno">Aguardando RA...</div>
       </div>
     </div>
@@ -134,9 +126,9 @@
       </div>
       
       <div class="campo" style="background: rgba(255,255,255,0.03); padding: 20px; border-radius: 12px; border: 1px solid var(--borda);">
-        <label style="text-align: center; display: block; margin-bottom: 12px;">Digite o código de 6 dígitos do Preceptor</label>
-        <input type="text" id="codigoPreceptor" placeholder="000 000" maxlength="7" style="text-align: center; font-family: var(--mono); font-size: 24px; letter-spacing: 4px; border-color: var(--cor-periodo);" required>
-        <div class="erro-msg" id="erroMsg">❌ Código expirado ou incorreto</div>
+        <label style="text-align: center; display: block; margin-bottom: 12px;">Senha de Validação (Token do Dia)</label>
+        <input type="text" id="codigoPreceptor" placeholder="DDMM" maxlength="4" style="text-align: center; font-family: var(--mono); font-size: 24px; letter-spacing: 4px; border-color: var(--cor-periodo);" required>
+        <div class="erro-msg" id="erroMsg">❌ Senha incorreta ou expirada</div>
       </div>
     </div>
 
@@ -153,39 +145,32 @@
   </div>
 
   <script>
-    const URL_PLANILHA = https://script.google.com/macros/s/AKfycbxXa9mU4-mjfQX0Ao6E0VPVWxEV2R87L0XYtPf2VzyU_tOitK3combG3lm_Z_ZyhBAI/exec   
-    // Chaves idênticas ao Painel do Token
-    const CHAVES = {
-      5: "MED5-ALPHA-2026",
-      6: "MED6-BETA-2026",
-      7: "MED7-GAMMA-2026",
-      8: "MED8-DELTA-2026"
+    const URL_PLANILHA = "https://script.google.com/macros/s/AKfycbxXa9mU4-mjfQX0Ao6E0VPVWxEV2R87L0XYtPf2VzyU_tOitK3combG3lm_Z_ZyhBAI/exec";
+
+    // 1. CAPTURA DADOS DA URL IMEDIATAMENTE
+    window.onload = function() {
+      const params = new URLSearchParams(window.location.search);
+      const nomeUrl = params.get("nome");
+      const raUrl = params.get("ra");
+      const periodoUrl = params.get("periodo");
+
+      if (nomeUrl) {
+        const nomeDecodificado = decodeURIComponent(nomeUrl);
+        document.getElementById("nomeAluno").textContent = nomeDecodificado;
+        document.getElementById("nomeOculto").value = nomeDecodificado;
+        document.getElementById("avatarLetra").textContent = nomeDecodificado.charAt(0).toUpperCase();
+      }
+      if (raUrl) {
+        document.getElementById("raAluno").textContent = "RA: " + raUrl;
+        document.getElementById("raOculto").value = raUrl;
+      }
+      if (periodoUrl) {
+        const selectP = document.getElementById("periodo");
+        selectP.value = periodoUrl;
+        atualizarCores();
+      }
+      document.getElementById("dataEstagio").value = new Date().toISOString().split("T")[0];
     };
-
-    // Captura dados da URL (QR Code)
-    const params = new URLSearchParams(window.location.search);
-    const nomeUrl = params.get("nome");
-    const raUrl = params.get("ra");
-    const periodoUrl = params.get("periodo");
-
-    if (nomeUrl) {
-      document.getElementById("nomeAluno").textContent = decodeURIComponent(nomeUrl);
-      document.getElementById("nomeOculto").value = decodeURIComponent(nomeUrl);
-      document.getElementById("avatarLetra").textContent = nomeUrl.charAt(0).toUpperCase();
-    }
-    if (raUrl) {
-      document.getElementById("raAluno").textContent = "RA: " + raUrl;
-      document.getElementById("raOculto").value = raUrl;
-    }
-    if (periodoUrl) {
-      const selectP = document.getElementById("periodo");
-      selectP.value = periodoUrl;
-      selectP.style.pointerEvents = "none"; // Trava para o aluno não mudar
-      atualizarCores();
-    }
-
-    // Define data de hoje
-    document.getElementById("dataEstagio").value = new Date().toISOString().split("T")[0];
 
     function atualizarCores() {
       const p = document.getElementById("periodo").value;
@@ -194,53 +179,26 @@
       document.documentElement.style.setProperty('--cor-periodo', corAtiva);
     }
 
-    // Gerador de Hash (Igual ao do Preceptor)
-    function gerarTokenCorreto(periodo) {
-      const INTERVALO = 5 * 60;
-      const janela = Math.floor(Math.floor(Date.now() / 1000) / INTERVALO);
-      const semente = janela + "|" + (CHAVES[periodo] || "");
-      
-      let hash = 5381;
-      for (let i = 0; i < semente.length; i++) {
-        hash = ((hash << 5) + hash) ^ semente.charCodeAt(i);
-        hash = hash & hash;
-      }
-      
-      const CHARS = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
-      let token = "";
-      let n = Math.abs(hash);
-      for (let i = 0; i < 6; i++) {
-        token += CHARS[n % CHARS.length];
-        n = Math.floor(n / CHARS.length) + (i * 13);
-      }
-      return token;
-    }
-
     function enviar(e) {
       e.preventDefault();
-      const periodo = document.getElementById("periodo").value;
-      const tokenDigitado = document.getElementById("codigoPreceptor").value.toUpperCase().replace(/\s/g, '');
-      const tokenCorreto = gerarTokenCorreto(periodo);
-      const erro = document.getElementById("erroMsg");
-
-      if (tokenDigitado !== tokenCorreto) {
-        erro.classList.add("visivel");
-        return;
-      }
-
-      erro.classList.remove("visivel");
+      
       const btn = document.getElementById("btnEnviar");
+      const erro = document.getElementById("erroMsg");
+      const tokenDigitado = document.getElementById("codigoPreceptor").value;
+
       btn.disabled = true;
       btn.textContent = "Validando...";
+      erro.classList.remove("visivel");
 
       const dados = {
         nome: document.getElementById("nomeOculto").value,
         matricula: document.getElementById("raOculto").value,
-        periodo: periodo + "º Período",
+        periodo: document.getElementById("periodo").value + "º Período",
         dataEstagio: document.getElementById("dataEstagio").value,
         diaSemana: document.getElementById("diaSemana").value,
         hospital: document.getElementById("hospital").value,
-        professor: document.getElementById("professor").value
+        professor: document.getElementById("professor").value,
+        tokenProfessor: tokenDigitado // Campo que o Google Script vai ler
       };
 
       fetch(URL_PLANILHA, {
@@ -249,6 +207,9 @@
         body: JSON.stringify(dados)
       })
       .then(() => {
+        // Como o modo é no-cors, não recebemos a resposta de erro do Google
+        // mas se a senha estiver errada, o Google Script não salvará na planilha.
+        // O ideal é que o professor informe o código DDMM certo (Ex: 0203 para hoje)
         document.getElementById("overlaySuccesso").classList.add("ativo");
       })
       .catch(() => alert("Erro de conexão"))
