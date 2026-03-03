@@ -12,12 +12,14 @@
     .card { background: var(--superficie); border: 1px solid var(--borda); border-radius: 16px; padding: 24px; width: 100%; max-width: 480px; position: relative; border-top: 4px solid var(--verde); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
     .per-badge { display: inline-block; padding: 4px 12px; background: rgba(0,200,150,0.1); color: var(--verde); border-radius: 100px; font-size: 11px; font-weight: bold; margin-bottom: 15px; }
     h1 { font-size: 22px; margin-bottom: 5px; color: white; }
-    .ra-txt { font-family: 'Space Mono'; opacity: 0.6; font-size: 14px; color: var(--verde); }
-    .periodo-info { margin-top: 15px; padding: 12px; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px dashed var(--borda); font-size: 13px; text-align: center; }
+    .ra-txt { font-family: 'Space Mono'; opacity: 0.8; font-size: 14px; color: var(--verde); }
+    
     form { width: 100%; max-width: 480px; margin-top: 25px; }
     .campo { margin-bottom: 15px; }
     label { display: block; font-size: 11px; color: #7AAB8A; text-transform: uppercase; margin-bottom: 6px; font-weight: bold; }
     input, select { width: 100%; padding: 14px; background: #162019; border: 1px solid var(--borda); border-radius: 10px; color: white; font-size: 16px; outline: none; }
+    input:read-only { opacity: 0.6; cursor: not-allowed; }
+    
     .btn { width: 100%; padding: 16px; background: var(--verde); border: none; border-radius: 12px; color: #000; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; margin-top: 10px; }
     .btn:disabled { opacity: 0.5; }
     .btn-controle { display: block; width: 100%; text-align: center; text-decoration: none; color: var(--verde); margin-top: 20px; font-size: 14px; border: 1px solid var(--verde); padding: 12px; border-radius: 10px; }
@@ -26,17 +28,30 @@
 <body>
 
   <div class="card">
-    <div class="per-badge">5º PERÍODO</div>
-    <h1 id="exibeNome">Identificando...</h1>
+    <div class="per-badge" id="badgePeriodo">CARREGANDO...</div>
+    <h1 id="exibeNome">Identificando Aluno...</h1>
     <div class="ra-txt" id="exibeRA">RA: ----</div>
-    <div class="periodo-info">
-      📅 <strong>Período do Estágio:</strong><br>09/02/2026 a 13/03/2026
-    </div>
   </div>
 
   <form id="formEstagio">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+      <div class="campo">
+        <label>Data de Hoje</label>
+        <input type="text" id="dataHoje" readonly>
+      </div>
+      <div class="campo">
+        <label>Dia da Semana</label>
+        <input type="text" id="diaSemana" readonly>
+      </div>
+    </div>
+
     <div class="campo">
-      <label>Unidade / Hospital</label>
+      <label>Período do Aluno</label>
+      <input type="text" id="periodoAluno" readonly>
+    </div>
+
+    <div class="campo">
+      <label>Local do Estágio</label>
       <select id="hospital" required>
         <option value="">Selecione o local...</option>
         <option>Hospital Regional</option>
@@ -68,22 +83,30 @@
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbxXa9mU4-mjfQX0Ao6E0VPVWxEV2R87L0XYtPf2VzyU_tOitK3combG3lm_Z_ZyhBAI/exec";
     
-    // FUNÇÃO QUE CORRIGE O NOME E RA
-    function inicializar() {
+    function inicializarPagina() {
       const urlParams = new URLSearchParams(window.location.search);
-      const nomeP = urlParams.get("nome");
-      const raP = urlParams.get("ra");
+      const nomeUrl = urlParams.get("nome");
+      const raUrl = urlParams.get("ra");
+      const perUrl = urlParams.get("periodo") || "5"; // Pega o período da URL ou usa 5 como padrão
 
-      if (nomeP && raP) {
-        document.getElementById("exibeNome").textContent = decodeURIComponent(nomeP);
-        document.getElementById("exibeRA").textContent = "RA: " + raP;
-        document.getElementById("linkControle").href = `controle.html?nome=${nomeP}&ra=${raP}`;
-      } else {
-        document.getElementById("exibeNome").textContent = "Aluno não encontrado";
+      // 1. Preenche identificação visual
+      if (nomeUrl && raUrl) {
+        document.getElementById("exibeNome").innerText = decodeURIComponent(nomeUrl);
+        document.getElementById("exibeRA").innerText = "RA: " + raUrl;
+        document.getElementById("badgePeriodo").innerText = perUrl + "º PERÍODO";
+        document.getElementById("periodoAluno").value = perUrl + "º Período";
+        document.getElementById("linkControle").href = `controle.html?nome=${nomeUrl}&ra=${raUrl}&periodo=${perUrl}`;
       }
+
+      // 2. Preenche Data e Dia da Semana automaticamente
+      const hoje = new Date();
+      const dias = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
+      
+      document.getElementById("dataHoje").value = hoje.toLocaleDateString('pt-BR');
+      document.getElementById("diaSemana").value = dias[hoje.getDay()];
     }
 
-    window.onload = inicializar;
+    window.onload = inicializarPagina;
 
     document.getElementById("formEstagio").onsubmit = async (e) => {
       e.preventDefault();
@@ -96,8 +119,9 @@
       const payload = {
         nome: decodeURIComponent(urlParams.get("nome")),
         matricula: urlParams.get("ra"),
-        periodo: "5º Período",
-        dataEstagio: new Date().toLocaleDateString('pt-BR'),
+        periodo: document.getElementById("periodoAluno").value,
+        dataEstagio: document.getElementById("dataHoje").value,
+        diaSemana: document.getElementById("diaSemana").value,
         hospital: document.getElementById("hospital").value,
         professor: document.getElementById("professor").value,
         tokenProfessor: document.getElementById("senha").value
@@ -105,10 +129,10 @@
 
       try {
         await fetch(API_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) });
-        alert("Registro enviado! Redirecionando...");
-        window.location.href = `controle.html?nome=${urlParams.get("nome")}&ra=${urlParams.get("ra")}`;
+        alert("Presença registrada com sucesso!");
+        window.location.href = `controle.html?nome=${urlParams.get("nome")}&ra=${urlParams.get("ra")}&periodo=${urlParams.get("periodo")}`;
       } catch (err) {
-        alert("Erro de conexão.");
+        alert("Erro na conexão.");
         btn.disabled = false;
         btn.textContent = "REGISTRAR PRESENÇA";
       }
