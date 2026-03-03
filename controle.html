@@ -2,98 +2,243 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FMC - Controle Individual</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Meu Estágio — Caderneta Digital</title>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <style>
-    :root { --azul: #00C2FF; --bg: #05080A; --surface: #0F1923; --border: #1C2E3D; }
-    body { background: var(--bg); color: white; font-family: sans-serif; padding: 20px; text-align: center; }
-    
-    .fmc-header { margin-bottom: 25px; border-bottom: 1px solid var(--border); padding-bottom: 15px; }
-    .fmc-logo { width: 90px; filter: brightness(0) invert(1); margin-bottom: 10px; }
-    .fmc-header h2 { font-size: 15px; letter-spacing: 1px; }
-    
-    .ficha-box { background: var(--surface); padding: 20px; border-radius: 16px; border: 1px solid var(--border); max-width: 480px; margin: auto; text-align: left; }
-    .ficha-titulo { text-align: center; font-weight: bold; color: var(--azul); font-size: 12px; letter-spacing: 2px; margin-bottom: 15px; text-transform: uppercase; }
-    
-    .info-row { margin-bottom: 5px; font-size: 14px; }
-    .info-row b { opacity: 0.6; font-weight: normal; margin-right: 5px; }
+    :root {
+      --bg:      #05080A;
+      --surface: #0F1923;
+      --surface2:#141F2A;
+      --border:  #1C2E3D;
+      --text:    #D8EAF5;
+      --muted:   #5A7A90;
+      --muted2:  #3A5570;
+      --mono:    'DM Mono', monospace;
+      --display: 'Syne', sans-serif;
+      --body:    'DM Sans', sans-serif;
+      /* Cores Padrão (Serão sobrescritas pelo JS) */
+      --cor:     #00C2FF;
+      --cor2:    #0087CC;
+      --cor-bg:  rgba(0,194,255,0.08);
+      --cor-brd: rgba(0,194,255,0.2);
+    }
 
-    .grid-presenca { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 20px 0; }
-    .dot { height: 40px; border: 1px solid var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #3A5570; font-size: 12px; }
-    .dot.on { background: var(--azul); border-color: var(--azul); color: black; box-shadow: 0 0 10px rgba(0,194,255,0.3); }
-
-    .historico-lista { margin-top: 25px; }
-    .item-h { background: #141F2A; padding: 12px; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
-    .item-h .info { font-size: 13px; }
-    .item-h .info span { display: block; font-size: 11px; opacity: 0.5; }
-    .badge-p { background: rgba(0,194,255,0.1); color: var(--azul); padding: 4px 8px; border-radius: 5px; font-size: 10px; font-weight: bold; }
+    /* ... Mantenha todo o seu CSS original aqui, ele está impecável ... */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: var(--body); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 0 0 80px; overflow-x: hidden; }
+    body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(0,194,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(0,194,255,0.025) 1px, transparent 1px); background-size: 44px 44px; pointer-events: none; z-index: 0; }
+    .glow { position: fixed; top: -160px; left: 50%; transform: translateX(-50%); width: 600px; height: 340px; background: radial-gradient(ellipse, var(--cor-bg) 0%, transparent 70%); pointer-events: none; z-index: 0; transition: background 0.5s; }
+    .hero { width: 100%; max-width: 480px; padding: 40px 24px 0; position: relative; z-index: 1; animation: fadeDown 0.6s ease both; }
+    .hero-tag { font-family: var(--mono); font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--muted); margin-bottom: 20px; }
+    .id-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 24px; position: relative; overflow: hidden; }
+    .id-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--cor2), var(--cor)); }
+    .id-top { display: flex; align-items: center; gap: 18px; }
+    .avatar { width: 72px; height: 72px; border-radius: 18px; background: linear-gradient(135deg, var(--cor2), var(--cor)); display: flex; align-items: center; justify-content: center; font-family: var(--display); font-size: 26px; font-weight: 800; color: #000; flex-shrink: 0; position: relative; }
+    .avatar-ra { position: absolute; bottom: -7px; right: -7px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px; font-family: var(--mono); font-size: 9px; color: var(--muted); padding: 2px 6px; }
+    .id-nome { font-family: var(--display); font-size: 22px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; }
+    .id-periodo { display: inline-flex; align-items: center; gap: 5px; background: var(--cor-bg); border: 1px solid var(--cor-brd); border-radius: 6px; padding: 3px 10px; font-family: var(--mono); font-size: 10px; color: var(--cor); letter-spacing: 0.06em; margin-top: 7px; }
+    .progresso-bloco { margin-top: 20px; }
+    .prog-topo { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px; }
+    .prog-label { font-family: var(--mono); font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); }
+    .prog-num { font-family: var(--display); font-size: 32px; font-weight: 800; letter-spacing: -0.03em; color: var(--cor); line-height: 1; }
+    .prog-num span { font-size: 16px; color: var(--muted); font-weight: 400; }
+    .barra-bg { height: 10px; background: var(--border); border-radius: 100px; overflow: hidden; margin-bottom: 10px; }
+    .barra-fill { height: 100%; background: linear-gradient(90deg, var(--cor2), var(--cor)); border-radius: 100px; transition: width 1.4s cubic-bezier(0.4,0,0.2,1); width: 0%; }
+    .dots-grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 5px; }
+    .dot { height: 8px; border-radius: 100px; background: var(--border); transition: background 0.4s; }
+    .dot.on { background: var(--cor); }
+    .status-badge { display: inline-flex; align-items: center; gap: 7px; border-radius: 100px; padding: 6px 14px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.06em; margin-top: 14px; }
+    .status-badge.andamento { background: rgba(255,184,0,0.1); border: 1px solid rgba(255,184,0,0.25); color: #FFB800; }
+    .status-badge.concluido { background: rgba(0,212,138,0.1); border: 1px solid rgba(0,212,138,0.25); color: #00D48A; }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; animation: blink 2s ease infinite; }
+    .andamento .status-dot { background: #FFB800; }
+    .concluido .status-dot { background: #00D48A; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+    .secao { width: 100%; max-width: 480px; padding: 0 24px; position: relative; z-index: 1; margin-top: 32px; animation: fadeUp 0.6s 0.15s ease both; }
+    .secao-titulo { font-family: var(--mono); font-size: 9px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--muted); margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+    .secao-titulo::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .escalas-lista { display: flex; flex-direction: column; gap: 10px; }
+    .escala-item { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 16px 18px; display: flex; align-items: center; gap: 14px; transition: border-color 0.2s, transform 0.2s; animation: fadeUp 0.4s ease both; }
+    .escala-item:hover { border-color: var(--cor-brd); transform: translateX(4px); }
+    .escala-nr { width: 36px; height: 36px; border-radius: 10px; background: var(--cor-bg); border: 1px solid var(--cor-brd); display: flex; align-items: center; justify-content: center; font-family: var(--display); font-size: 15px; font-weight: 800; color: var(--cor); flex-shrink: 0; }
+    .escala-info { flex: 1; min-width: 0; }
+    .escala-hospital { font-weight: 600; font-size: 14px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .escala-meta { display: flex; gap: 8px; margin-top: 4px; flex-wrap: wrap; }
+    .meta-chip { font-family: var(--mono); font-size: 10px; color: var(--muted); background: var(--surface2); border: 1px solid var(--border); border-radius: 5px; padding: 2px 7px; white-space: nowrap; }
+    .escala-timestamp { font-family: var(--mono); font-size: 10px; color: var(--muted2); text-align: right; flex-shrink: 0; line-height: 1.5; }
+    .vazio { text-align: center; padding: 48px 24px; background: var(--surface); border: 1px dashed var(--border); border-radius: 16px; }
+    .vazio-icone { font-size: 40px; margin-bottom: 12px; }
+    .vazio-texto { font-size: 14px; color: var(--muted); line-height: 1.6; }
+    .loading { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 48px 24px; color: var(--muted); font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; }
+    .spinner { width: 28px; height: 28px; border: 2px solid var(--border); border-top-color: var(--cor); border-radius: 50%; animation: spin 0.8s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .btn-registrar { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; background: var(--cor); color: #000; border: none; border-radius: 14px; padding: 17px; font-family: var(--mono); font-size: 13px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; cursor: pointer; text-decoration: none; margin-top: 28px; transition: 0.2s; }
+    .btn-registrar:hover { opacity: 0.88; transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+    .rodape { width: 100%; max-width: 480px; padding: 24px 24px 0; display: flex; justify-content: space-between; border-top: 1px solid var(--border); margin-top: 40px; position: relative; z-index: 1; }
+    .rodape span { font-family: var(--mono); font-size: 10px; color: var(--muted2); letter-spacing: 0.06em; }
+    @keyframes fadeDown { from { opacity:0; transform:translateY(-16px); } to { opacity:1; transform:translateY(0); } }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
   </style>
 </head>
 <body>
 
-  <div class="fmc-header">
-    <img src="https://alexandro391.github.io/caderneta-digital-estagio/imagens/fmc_fbpn.jpg" alt="Logo FMC" class="fmc-logo">
-    <h2>FACULDADE DE MEDICINA DE CAMPOS</h2>
-    <p style="font-size: 11px; opacity: 0.6; text-transform: uppercase;">Prática de Clínica Médica I</p>
-  </div>
+<div class="glow" id="glow"></div>
 
-  <div class="ficha-box">
-    <div class="ficha-titulo">Ficha Individual de Estágio</div>
-    
-    <div class="info-row"><b>Aluno:</b> <span id="n">...</span></div>
-    <div class="info-row"><b>Matrícula:</b> <span id="r">...</span></div>
-
-    <div id="statusTxt" style="text-align: center; margin-top: 15px; font-size: 24px; font-weight: bold;">0 / 20</div>
-    
-    <div class="grid-presenca" id="grid"></div>
-
-    <h4 style="font-size: 12px; color: var(--azul); margin-top: 20px;">HISTÓRICO RECENTE</h4>
-    <div id="historico" class="historico-lista">
-      <p style="font-size: 11px; opacity: 0.4;">Buscando registros...</p>
+<div class="hero">
+  <div class="hero-tag">// caderneta digital — meu estágio</div>
+  <div class="id-card">
+    <div class="id-top">
+      <div class="avatar" id="avatar">
+        <span id="avatarLetra">?</span>
+        <div class="avatar-ra" id="avatarRa">RA —</div>
+      </div>
+      <div>
+        <div class="id-nome" id="nomeAluno">Carregando...</div>
+        <div class="id-periodo" id="periodoBadge">◆ — Período</div>
+      </div>
     </div>
+    <div class="progresso-bloco">
+      <div class="prog-topo">
+        <span class="prog-label">// escalas concluídas</span>
+        <span class="prog-num" id="progNum">0 <span>/ 12</span></span>
+      </div>
+      <div class="barra-bg"><div class="barra-fill" id="barraFill"></div></div>
+      <div class="dots-grid" id="dotsGrid"></div>
+    </div>
+    <div id="statusBadge"></div>
   </div>
+</div>
 
-  <script>
-    const API = "https://script.google.com/macros/s/AKfycbxXa9mU4-mjfQX0Ao6E0VPVWxEV2R87L0XYtPf2VzyU_tOitK3combG3lm_Z_ZyhBAI/exec";
-    const params = new URLSearchParams(window.location.search);
-    const ra = params.get("ra");
+<div class="secao">
+  <div class="secao-titulo">// histórico de escalas</div>
+  <div id="listaEscalas">
+    <div class="loading"><div class="spinner"></div>BUSCANDO REGISTROS...</div>
+  </div>
+  <a id="btnRegistrar" href="#" class="btn-registrar">＋ Registrar Nova Escala</a>
+</div>
 
-    document.getElementById("n").innerText = decodeURIComponent(params.get("nome") || "---");
-    document.getElementById("r").innerText = ra || "---";
+<div class="rodape">
+  <span>CADERNETA DIGITAL v1.0</span>
+  <span id="ultimoUpdate">—</span>
+</div>
 
-    const grid = document.getElementById("grid");
-    for(let i=1; i<=20; i++) {
-      const d = document.createElement("div");
-      d.className = "dot"; d.id = "dot"+i; d.innerText = i;
-      grid.appendChild(d);
+<script>
+  // ============================================================
+  const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbxXa9mU4-mjfQX0Ao6E0VPVWxEV2R87L0XYtPf2VzyU_tOitK3combG3lm_Z_ZyhBAI/exec";
+  const URL_BASE   = "https://alexandro391.github.io/caderneta-digital-estagio/caderneta.html";
+  // ============================================================
+
+  // Cores Sincronizadas com o Painel e Caderneta
+  const CORES = {
+    "5":{ cor:"#00C2FF", cor2:"#0055AA", bg:"rgba(0,194,255,0.08)", brd:"rgba(0,194,255,0.22)" },
+    "6":{ cor:"#00D48A", cor2:"#007A50", bg:"rgba(0,212,138,0.08)", brd:"rgba(0,212,138,0.22)" },
+    "7":{ cor:"#FFB800", cor2:"#8A5200", bg:"rgba(255,184,0,0.08)", brd:"rgba(255,184,0,0.22)" },
+    "8":{ cor:"#9B6FFF", cor2:"#6B00AA", bg:"rgba(155,111,255,0.08)", brd:"rgba(155,111,255,0.22)" }
+  };
+
+  const params = new URLSearchParams(window.location.search);
+  const nomeQR = params.get("nome") ? params.get("nome").replace(/_/g," ") : "";
+  const raQR   = params.get("ra")   || "";
+  const perQR  = params.get("periodo") || "5";
+
+  function iniciais(nome) {
+    const p = nome.trim().split(" ");
+    return p.length === 1 ? p[0][0].toUpperCase() : (p[0][0]+p[p.length-1][0]).toUpperCase();
+  }
+
+  function aplicarCores(periodo) {
+    const c = CORES[periodo] || CORES["5"];
+    const r = document.documentElement.style;
+    r.setProperty("--cor",    c.cor);
+    r.setProperty("--cor2",   c.cor2);
+    r.setProperty("--cor-bg", c.bg);
+    r.setProperty("--cor-brd",c.brd);
+    document.getElementById("glow").style.background = `radial-gradient(ellipse, ${c.bg} 0%, transparent 70%)`;
+  }
+
+  function preencherIdentidade(nome, ra, periodo) {
+    document.title = nome + " — Meu Estágio";
+    document.getElementById("avatarLetra").textContent  = iniciais(nome);
+    document.getElementById("avatarRa").textContent     = "RA " + ra;
+    document.getElementById("nomeAluno").textContent    = nome;
+    document.getElementById("periodoBadge").textContent = "◆ " + periodo + "º Período";
+    aplicarCores(periodo);
+    // Link para registrar nova escala carregando os dados corretos
+    document.getElementById("btnRegistrar").href = `${URL_BASE}?nome=${encodeURIComponent(nome)}&ra=${ra}&periodo=${periodo}`;
+  }
+
+  const dotsGrid = document.getElementById("dotsGrid");
+  for (let i = 0; i < 12; i++) {
+    const d = document.createElement("div");
+    d.className = "dot"; d.id = "dot"+i;
+    dotsGrid.appendChild(d);
+  }
+
+  function atualizarProgresso(feitas) {
+    feitas = Math.min(feitas, 12);
+    document.getElementById("progNum").innerHTML = feitas + ' <span>/ 12</span>';
+    document.getElementById("barraFill").style.width = (feitas/12*100)+"%";
+    for (let i=0;i<12;i++) document.getElementById("dot"+i).classList.toggle("on", i < feitas);
+
+    const badge = document.getElementById("statusBadge");
+    if (feitas >= 12) {
+      badge.innerHTML = `<div class="status-badge concluido"><span class="status-dot"></span>ESCALA CONCLUÍDA ✓</div>`;
+    } else {
+      const r = 12 - feitas;
+      badge.innerHTML = `<div class="status-badge andamento"><span class="status-dot"></span>EM ANDAMENTO — ${r} restante${r!==1?"s":""}</div>`;
     }
+  }
 
-    async function carregar() {
-      if(!ra) return;
-      try {
-        const resp = await fetch(`${API}?action=aluno&ra=${ra}`);
-        const data = await resp.json();
-        const regs = data.registros || [];
-        
-        document.getElementById("statusTxt").innerText = `${regs.length} / 20`;
-
-        for(let i=1; i<=regs.length; i++) {
-          const dot = document.getElementById("dot"+i);
-          if(dot) dot.className = "dot on";
-        }
-
-        document.getElementById("historico").innerHTML = regs.map((reg, idx) => `
-          <div class="item-h">
-            <div class="info">
-              <b>${idx+1}. ${reg.hospital}</b>
-              <span>${reg.data} (${reg.diaSemana})</span>
+  function renderizarEscalas(registros) {
+    const lista = document.getElementById("listaEscalas");
+    if (!registros || registros.length === 0) {
+      lista.innerHTML = `<div class="vazio"><div class="vazio-icone">📋</div><div class="vazio-texto">Nenhuma escala registrada ainda.<br>Use o botão abaixo para registrar.</div></div>`;
+      atualizarProgresso(0);
+      return;
+    }
+    registros.sort((a,b) => (parseInt(a.escala)||0) - (parseInt(b.escala)||0));
+    atualizarProgresso(registros.length);
+    lista.innerHTML = registros.map((r,i) => {
+      const ts = r.timestamp || "";
+      const data = ts.split(" ")[0] || "";
+      const hora = ts.split(" ")[1] || "";
+      const dia = r.diaSemana ? r.diaSemana.substring(0,3).toUpperCase() : "";
+      return `<div class="escala-item" style="animation-delay:${i*0.06}s">
+          <div class="escala-nr">${i+1}</div>
+          <div class="escala-info">
+            <div class="escala-hospital">${r.hospital||"—"}</div>
+            <div class="escala-meta">
+              <span class="meta-chip">${dia}</span>
+              <span class="meta-chip">${data}</span>
+              <span class="meta-chip">${r.professor||"—"}</span>
             </div>
-            <div class="badge-p">${reg.periodo}</div>
           </div>
-        `).join('');
-      } catch(e) { console.error(e); }
-    }
-    window.onload = carregar;
-  </script>
+          <div class="escala-timestamp">${hora}<br><span style="color:var(--muted2)">${data}</span></div>
+        </div>`;
+    }).join("");
+    document.getElementById("ultimoUpdate").textContent = "Atualizado: " + new Date().toLocaleTimeString("pt-BR");
+  }
+
+  function carregarDados(nome, ra, periodo) {
+    preencherIdentidade(nome, ra, periodo);
+    fetch(`${URL_SCRIPT}?action=aluno&ra=${ra}`)
+      .then(r => r.json())
+      .then(dados => renderizarEscalas(dados.registros || []))
+      .catch(() => {
+        document.getElementById("listaEscalas").innerHTML = `<div class="vazio"><div class="vazio-icone">📶</div><div class="vazio-texto">Erro de conexão.<br>Recarregue a página.</div></div>`;
+        atualizarProgresso(0);
+      });
+  }
+
+  if (nomeQR && raQR) {
+    carregarDados(nomeQR, raQR, perQR);
+  } else {
+    document.getElementById("nomeAluno").textContent = "Erro de Acesso";
+    document.getElementById("listaEscalas").innerHTML = `<div class="vazio"><div class="vazio-icone">📱</div><div class="vazio-texto">Use seu QR Code individual.</div></div>`;
+  }
+</script>
 </body>
 </html>
+
+
