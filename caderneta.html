@@ -17,10 +17,10 @@
     form { width: 100%; max-width: 480px; }
     .campo { margin-bottom: 15px; }
     label { display: block; font-size: 10px; color: var(--verde); text-transform: uppercase; font-weight: bold; margin-bottom: 5px; }
-    input, select { width: 100%; padding: 12px; background: #162019; border: 1px solid var(--borda); border-radius: 8px; color: white; font-size: 15px; }
-    .btn { width: 100%; padding: 16px; background: var(--verde); border: none; border-radius: 10px; color: #000; font-weight: bold; font-size: 16px; cursor: pointer; }
-    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-    .btn-progresso { display: block; text-align: center; margin-top: 15px; text-decoration: none; color: var(--verde); font-size: 13px; border: 1px solid var(--verde); padding: 10px; border-radius: 8px; }
+    input, select { width: 100%; padding: 12px; background: #162019; border: 1px solid var(--borda); border-radius: 8px; color: white; font-size: 15px; outline: none; border: 1px solid var(--borda); }
+    .btn { width: 100%; padding: 16px; background: var(--verde); border: none; border-radius: 10px; color: #000; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; background: #555; }
+    .btn-progresso { display: block; text-align: center; margin-top: 15px; text-decoration: none; color: var(--verde); font-size: 13px; border: 1px solid var(--verde); padding: 10px; border-radius: 8px; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -68,19 +68,27 @@
   <script>
     const API_URL = "https://script.google.com/macros/s/AKfycbxXa9mU4-mjfQX0Ao6E0VPVWxEV2R87L0XYtPf2VzyU_tOitK3combG3lm_Z_ZyhBAI/exec";
     
-    // Captura dados da URL
     const urlParams = new URLSearchParams(window.location.search);
     const nomeUrl = urlParams.get("nome");
     const raUrl = urlParams.get("ra");
     const periodoUrl = urlParams.get("periodo") || "5";
+
+    // Função para construir o link do controle
+    function atualizarLinkControle() {
+      if (nomeUrl && raUrl) {
+        const link = `controle.html?nome=${encodeURIComponent(nomeUrl)}&ra=${raUrl}&periodo=${periodoUrl}`;
+        document.getElementById("linkControle").href = link;
+        return link;
+      }
+      return "#";
+    }
 
     window.onload = () => {
       if (nomeUrl && raUrl) {
         document.getElementById("exibeNome").innerText = decodeURIComponent(nomeUrl);
         document.getElementById("exibeRA").innerText = "RA: " + raUrl;
         document.getElementById("periodoAluno").value = periodoUrl + "º Período";
-        // AJUSTE DO BOTÃO PROGRESSO
-        document.getElementById("linkControle").href = `controle.html?nome=${nomeUrl}&ra=${raUrl}&periodo=${periodoUrl}`;
+        atualizarLinkControle();
       }
       const hoje = new Date();
       document.getElementById("dataHoje").value = hoje.toLocaleDateString('pt-BR');
@@ -91,7 +99,9 @@
     document.getElementById("formEstagio").onsubmit = async (e) => {
       e.preventDefault();
       const btn = document.getElementById("btnConfirmar");
-      btn.disabled = true; // EVITA DUPLICIDADE
+      
+      // 1. Bloqueia o botão imediatamente para evitar cliques duplos
+      btn.disabled = true;
       btn.textContent = "PROCESSANDO...";
 
       const dados = {
@@ -106,12 +116,19 @@
       };
 
       try {
-        await fetch(API_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(dados) });
-        alert("Presença Registrada!");
-        // REDIRECIONAMENTO AUTOMÁTICO
-        window.location.href = `controle.html?nome=${nomeUrl}&ra=${raUrl}&periodo=${periodoUrl}`;
+        // Envia os dados
+        await fetch(API_URL, { 
+          method: "POST", 
+          mode: "no-cors", 
+          body: JSON.stringify(dados) 
+        });
+
+        // 2. Redirecionamento automático após 1 segundo (para garantir o envio)
+        alert("Presença enviada com sucesso! Redirecionando para seu controle...");
+        window.location.href = atualizarLinkControle();
+
       } catch (err) {
-        alert("Erro ao enviar. Tente novamente.");
+        alert("Erro ao enviar. Verifique sua conexão.");
         btn.disabled = false;
         btn.textContent = "CONFIRMAR PRESENÇA";
       }
