@@ -1,206 +1,89 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Caderneta Digital - FMC</title>
-
-<style>
-:root {
---verde:#00C896;
---fundo:#0A0F0D;
---superficie:#111A15;
---borda:#1E3028;
---texto:#E8F5EE;
-}
-
-*{box-sizing:border-box;margin:0;padding:0;}
-
-body{
-background:var(--fundo);
-color:var(--texto);
-font-family:Arial, sans-serif;
-padding:20px;
-display:flex;
-flex-direction:column;
-align-items:center;
-}
-
-.fmc-header{
-text-align:center;
-margin-bottom:25px;
-width:100%;
-max-width:480px;
-border-bottom:1px solid var(--borda);
-padding-bottom:20px;
-}
-
-.fmc-logo{
-width:100px;
-margin-bottom:10px;
-}
-
-.card-aluno{
-background:var(--superficie);
-border:1px solid var(--borda);
-border-radius:12px;
-padding:15px;
-width:100%;
-max-width:480px;
-margin-bottom:20px;
-text-align:center;
-}
-
-form{width:100%;max-width:480px;}
-
-.campo{margin-bottom:15px;}
-
-label{
-display:block;
-font-size:12px;
-color:var(--verde);
-font-weight:bold;
-margin-bottom:5px;
-}
-
-input,select{
-width:100%;
-padding:12px;
-background:#162019;
-border:1px solid var(--borda);
-border-radius:8px;
-color:white;
-font-size:15px;
-}
-
-.btn{
-width:100%;
-padding:16px;
-background:var(--verde);
-border:none;
-border-radius:10px;
-color:#000;
-font-weight:bold;
-font-size:16px;
-cursor:pointer;
-}
-
-.btn-progresso{
-display:block;
-text-align:center;
-margin-top:15px;
-text-decoration:none;
-color:var(--verde);
-border:1px solid var(--verde);
-padding:10px;
-border-radius:8px;
-}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Caderneta Digital</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root { --verde: #00C896; --fundo: #0A0F0D; --superficie: #111A15; --texto: #E8F5EE; --borda: #1E3028; }
+    body { background: var(--fundo); color: var(--texto); font-family: 'DM Sans', sans-serif; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+    .card { background: var(--superficie); border: 1px solid var(--borda); border-radius: 16px; padding: 20px; width: 100%; max-width: 450px; margin-bottom: 20px; }
+    .periodo-box { background: rgba(0,200,150,0.1); border: 1px dashed var(--verde); padding: 10px; border-radius: 8px; font-size: 12px; text-align: center; margin-top: 10px; color: var(--verde); }
+    input, select { width: 100%; padding: 12px; margin: 8px 0; background: #162019; border: 1px solid var(--borda); color: white; border-radius: 8px; }
+    .btn { width: 100%; padding: 15px; background: var(--verde); border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 15px; }
+    .btn:disabled { opacity: 0.5; }
+    #nomeExibicao { font-size: 18px; font-weight: bold; color: var(--verde); }
+  </style>
 </head>
-
 <body>
 
-<div class="fmc-header">
-<img src="imagens/fmc_fbpn.jpg" class="fmc-logo">
-<h2>FACULDADE DE MEDICINA DE CAMPOS</h2>
-<p>PRÁTICA DE CLÍNICA MÉDICA I</p>
-</div>
+  <div class="card">
+    <div id="nomeExibicao">Carregando Aluno...</div>
+    <div id="raExibicao" style="font-family: 'Space Mono'; opacity: 0.7;">RA: ---</div>
+    <div class="periodo-box">📅 Período de Estágio: 09/02/2026 a 13/03/2026</div>
+  </div>
 
-<div class="card-aluno">
-<span id="exibeNome">Carregando...</span><br>
-<span id="exibeRA">RA: ----</span>
-</div>
+  <form id="formCaderneta" style="width:100%; max-width:450px;">
+    <label>Hospital</label>
+    <select id="hospital" required>
+      <option value="">Selecione a Unidade...</option>
+      <option>Hospital Regional</option>
+      <option>Hospital Central</option>
+      <option>UPA 24h</option>
+    </select>
 
-<form id="formEstagio">
+    <label>Preceptor</label>
+    <select id="professor" required>
+      <option value="">Selecione o Médico...</option>
+      <option>Dr. Marcos Andrade</option>
+      <option>Dra. Helena Costa</option>
+    </select>
 
-<div class="campo">
-<label>Data</label>
-<input type="text" id="dataHoje" readonly>
-</div>
+    <div style="background: rgba(255,255,255,0.03); padding: 15px; border-radius: 10px; margin-top: 15px;">
+      <label style="display:block; text-align:center;">Senha de Validação</label>
+      <input type="password" id="senha" placeholder="••••" style="text-align:center; font-size: 24px;" required>
+    </div>
 
-<div class="campo">
-<label>Hospital</label>
-<select id="hospital" required>
-<option value="">Selecione...</option>
-<option>Hospital Regional</option>
-<option>Hospital Central</option>
-<option>Santa Casa</option>
-<option>UPA 24h</option>
-</select>
-</div>
+    <button type="submit" id="btnEnviar" class="btn">CONFIRMAR PRESENÇA</button>
+  </form>
 
-<div class="campo">
-<label>Senha do Dia</label>
-<input type="password" id="senha" required>
-</div>
+  <script>
+    const URL_PLANILHA = "SUA_URL_AQUI"; // <--- COLOQUE SEU LINK AQUI
 
-<button type="submit" id="btnConfirmar" class="btn">
-CONFIRMAR PRESENÇA
-</button>
+    const params = new URLSearchParams(window.location.search);
+    const nome = params.get("nome") || "Aluno não identificado";
+    const ra = params.get("ra") || "0000";
 
-<a id="linkControle" class="btn-progresso">
-VER MEU PROGRESSO
-</a>
+    document.getElementById("nomeExibicao").textContent = decodeURIComponent(nome);
+    document.getElementById("raExibicao").textContent = "RA: " + ra;
 
-</form>
+    document.getElementById("formCaderneta").onsubmit = async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById("btnEnviar");
+      btn.disabled = true;
+      btn.textContent = "PROCESSANDO...";
 
-<script>
-const API_URL="https://script.google.com/macros/s/AKfycbxXa9mU4-mjfQX0Ao6E0VPVWxEV2R87L0XYtPf2VzyU_tOitK3combG3lm_Z_ZyhBAI/exec";
-const REPO="/caderneta-digital-estagio/";
+      const dados = {
+        nome: decodeURIComponent(nome),
+        matricula: ra,
+        hospital: document.getElementById("hospital").value,
+        professor: document.getElementById("professor").value,
+        tokenProfessor: document.getElementById("senha").value,
+        dataEstagio: new Date().toLocaleDateString('pt-BR'),
+        periodo: "5º Período"
+      };
 
-const params=new URLSearchParams(window.location.search);
-const nome=params.get("nome");
-const ra=params.get("ra");
-const periodo=params.get("periodo")||"5";
-
-if(!nome||!ra){
-alert("Erro: dados não encontrados na URL.");
-}
-
-document.getElementById("exibeNome").innerText=decodeURIComponent(nome||"");
-document.getElementById("exibeRA").innerText="RA: "+(ra||"");
-
-document.getElementById("linkControle").href=
-REPO+"controle.html?nome="+encodeURIComponent(nome)+"&ra="+ra+"&periodo="+periodo;
-
-document.getElementById("dataHoje").value=
-new Date().toLocaleDateString("pt-BR");
-
-document.getElementById("formEstagio").addEventListener("submit",async function(e){
-e.preventDefault();
-
-const btn=document.getElementById("btnConfirmar");
-btn.disabled=true;
-btn.textContent="Processando...";
-
-const dados={
-nome:decodeURIComponent(nome),
-matricula:ra,
-periodo:periodo,
-dataEstagio:document.getElementById("dataHoje").value,
-hospital:document.getElementById("hospital").value,
-tokenProfessor:document.getElementById("senha").value
-};
-
-try{
-await fetch(API_URL,{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify(dados)
-});
-
-alert("Presença registrada com sucesso!");
-
-window.location.href=
-REPO+"controle.html?nome="+encodeURIComponent(nome)+"&ra="+ra+"&periodo="+periodo;
-
-}catch(err){
-alert("Erro ao enviar.");
-btn.disabled=false;
-btn.textContent="CONFIRMAR PRESENÇA";
-}
-});
-</script>
-
+      try {
+        await fetch(URL_PLANILHA, { method: "POST", mode: "no-cors", body: JSON.stringify(dados) });
+        alert("Presença Registrada! Redirecionando para o Controle...");
+        window.location.href = `controle.html?nome=${nome}&ra=${ra}`;
+      } catch (err) {
+        alert("Erro ao conectar ao servidor.");
+        btn.disabled = false;
+        btn.textContent = "CONFIRMAR PRESENÇA";
+      }
+    };
+  </script>
 </body>
 </html>
