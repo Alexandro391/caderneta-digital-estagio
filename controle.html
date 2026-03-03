@@ -5,28 +5,47 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Progresso — 20 Encontros</title>
   <style>
-    body { background: #05080A; color: white; font-family: sans-serif; padding: 20px; text-align: center; }
-    .box { background: #0F1923; padding: 25px; border-radius: 20px; border: 1px solid #1C2E3D; max-width: 450px; margin: auto; }
+    :root { --cor: #00C2FF; --bg: #05080A; --surface: #0F1923; --border: #1C2E3D; }
+    body { background: var(--bg); color: white; font-family: sans-serif; padding: 20px; text-align: center; }
+    
+    .box { background: var(--surface); padding: 25px; border-radius: 20px; border: 1px solid var(--border); max-width: 500px; margin: auto; }
+    
+    /* Progresso */
     .grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 20px 0; }
-    .dot { height: 45px; border: 2px solid #1C2E3D; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #3A5570; }
-    .dot.on { background: #00C2FF; border-color: #00C2FF; color: black; box-shadow: 0 0 10px #00C2FF; }
-    .bar-bg { width: 100%; height: 12px; background: #1C2E3D; border-radius: 6px; overflow: hidden; margin: 15px 0; }
-    .bar-fill { height: 100%; background: #00C2FF; width: 0%; transition: 1.5s; }
-    h2 { color: #00C2FF; margin-bottom: 5px; }
+    .dot { height: 45px; border: 2px solid var(--border); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #3A5570; font-size: 14px; }
+    .dot.on { background: var(--cor); border-color: var(--cor); color: black; box-shadow: 0 0 10px rgba(0,194,255,0.4); }
+    .bar-bg { width: 100%; height: 12px; background: var(--border); border-radius: 6px; overflow: hidden; margin: 15px 0; }
+    .bar-fill { height: 100%; background: var(--cor); width: 0%; transition: 1.5s ease-out; }
+    
+    /* Histórico Estilizado */
+    .historico-titulo { margin-top: 30px; text-align: left; font-size: 14px; color: var(--cor); font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+    .lista-historico { margin-top: 15px; text-align: left; }
+    .item-presenca { background: #141F2A; padding: 15px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+    .info-principal { display: flex; flex-direction: column; }
+    .info-hospital { font-weight: bold; font-size: 15px; color: white; }
+    .info-detalhes { font-size: 12px; color: #5A7A90; margin-top: 4px; }
+    .badge-periodo { background: rgba(0,194,255,0.1); color: var(--cor); padding: 4px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; }
+    
+    h2 { color: var(--cor); margin-bottom: 5px; }
   </style>
 </head>
 <body>
 
   <div style="margin-bottom: 30px;">
-    <h2 id="exibeNome">Carregando...</h2>
-    <p id="exibeRA" style="opacity: 0.5;">RA: ---</p>
+    <h2 id="n">Carregando...</h2>
+    <p id="r" style="opacity: 0.6; font-size: 14px;">RA: ---</p>
   </div>
 
   <div class="box">
-    <h3>Controle de Estágio</h3>
-    <div id="statusTxt" style="font-size: 24px; font-weight: bold; margin-top: 10px;">0 / 20</div>
+    <h3 style="font-size: 14px; opacity: 0.7;">AVANÇO DO ESTÁGIO</h3>
+    <div id="statusTxt" style="font-size: 28px; font-weight: bold; margin-top: 10px;">0 / 20</div>
     <div class="bar-bg"><div id="barra" class="bar-fill"></div></div>
     <div class="grid" id="dotsGrid"></div>
+
+    <div class="historico-titulo">📋 Histórico de Encontros</div>
+    <div id="listaHistorico" class="lista-historico">
+      <p style="color: #3A5570; font-size: 13px;">Buscando registros...</p>
+    </div>
   </div>
 
   <script>
@@ -36,35 +55,60 @@
     const ra = params.get("ra");
     const nome = params.get("nome");
 
-    document.getElementById("exibeNome").textContent = decodeURIComponent(nome || "Aluno");
-    document.getElementById("exibeRA").textContent = "RA: " + (ra || "---");
+    document.getElementById("n").innerText = decodeURIComponent(nome || "Aluno");
+    document.getElementById("r").innerText = "RA: " + (ra || "---");
 
-    // Criar os 20 círculos
+    // Gerar 20 círculos
     const grid = document.getElementById("dotsGrid");
     for(let i=1; i<=20; i++) {
       const d = document.createElement("div");
-      d.className = "dot"; d.id = "dot"+i; d.textContent = i;
+      d.className = "dot"; d.id = "dot"+i; d.innerText = i;
       grid.appendChild(d);
     }
 
-    async function atualizar() {
+    async function carregarProgresso() {
       if(!ra) return;
       try {
-        const r = await fetch(`${API}?action=aluno&ra=${ra}`);
-        const data = await r.json();
-        const total = data.registros.length;
+        const resp = await fetch(`${API}?action=aluno&ra=${ra}`);
+        const data = await resp.json();
+        const registros = data.registros || [];
+        const total = registros.length;
         
-        document.getElementById("statusTxt").textContent = total + " / 20";
-        document.getElementById("barra").style.width = (total/20*100) + "%";
+        // Atualiza Barra e Números
+        document.getElementById("statusTxt").innerText = `${total} / 20`;
+        document.getElementById("barra").style.width = (total / 20 * 100) + "%";
 
+        // Acende Círculos
         for(let i=1; i<=total; i++) {
           const el = document.getElementById("dot"+i);
           if(el) el.className = "dot on";
         }
-      } catch(e) { console.error("Erro ao carregar"); }
+
+        // Renderiza o Histórico com Data, Dia e Período
+        const listaDiv = document.getElementById("listaHistorico");
+        if(total === 0) {
+          listaDiv.innerHTML = "<p style='color:#3A5570; font-size:13px;'>Nenhum registro encontrado.</p>";
+        } else {
+          listaDiv.innerHTML = registros.map((reg, index) => `
+            <div class="item-presenca">
+              <div class="info-principal">
+                <span class="info-hospital">${index + 1}. ${reg.hospital}</span>
+                <span class="info-detalhes">
+                  📅 ${reg.data} (${reg.diaSemana})<br>
+                  👨‍⚕️ Preceptor: ${reg.professor}
+                </span>
+              </div>
+              <div class="badge-periodo">${reg.periodo}</div>
+            </div>
+          `).join('');
+        }
+
+      } catch(e) { 
+        document.getElementById("listaHistorico").innerHTML = "Erro ao carregar dados.";
+      }
     }
-    
-    window.onload = atualizar;
+
+    window.onload = carregarProgresso;
   </script>
 </body>
 </html>
