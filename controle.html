@@ -3,62 +3,97 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Controle de Estágio</title>
+  <title>FMC - Controle Individual</title>
   <style>
-    :root { --azul: #00C2FF; --fundo: #05080A; --card: #0F1923; }
-    body { background: var(--fundo); color: white; font-family: sans-serif; padding: 20px; }
-    .grid-dots { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 20px 0; }
-    .dot { height: 40px; border: 2px solid #1C2E3D; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #3A5570; }
-    .dot.active { background: var(--azul); border-color: var(--azul); color: black; font-weight: bold; }
-    .progress-bar { width: 100%; height: 10px; background: #1C2E3D; border-radius: 5px; overflow: hidden; }
-    .fill { height: 100%; background: var(--azul); width: 0%; transition: 1s; }
+    :root { --azul: #00C2FF; --bg: #05080A; --surface: #0F1923; --border: #1C2E3D; }
+    body { background: var(--bg); color: white; font-family: sans-serif; padding: 20px; text-align: center; }
+    
+    .fmc-header { margin-bottom: 25px; border-bottom: 1px solid var(--border); padding-bottom: 15px; }
+    .fmc-logo { width: 90px; filter: brightness(0) invert(1); margin-bottom: 10px; }
+    .fmc-header h2 { font-size: 15px; letter-spacing: 1px; }
+    
+    .ficha-box { background: var(--surface); padding: 20px; border-radius: 16px; border: 1px solid var(--border); max-width: 480px; margin: auto; text-align: left; }
+    .ficha-titulo { text-align: center; font-weight: bold; color: var(--azul); font-size: 12px; letter-spacing: 2px; margin-bottom: 15px; text-transform: uppercase; }
+    
+    .info-row { margin-bottom: 5px; font-size: 14px; }
+    .info-row b { opacity: 0.6; font-weight: normal; margin-right: 5px; }
+
+    .grid-presenca { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 20px 0; }
+    .dot { height: 40px; border: 1px solid var(--border); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #3A5570; font-size: 12px; }
+    .dot.on { background: var(--azul); border-color: var(--azul); color: black; box-shadow: 0 0 10px rgba(0,194,255,0.3); }
+
+    .historico-lista { margin-top: 25px; }
+    .item-h { background: #141F2A; padding: 12px; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+    .item-h .info { font-size: 13px; }
+    .item-h .info span { display: block; font-size: 11px; opacity: 0.5; }
+    .badge-p { background: rgba(0,194,255,0.1); color: var(--azul); padding: 4px 8px; border-radius: 5px; font-size: 10px; font-weight: bold; }
   </style>
 </head>
 <body>
 
-  <h2>Olá, <span id="userNome">...</span></h2>
-  <p>RA: <span id="userRA">...</span></p>
+  <div class="fmc-header">
+    <img src="https://alexandro391.github.io/caderneta-digital-estagio/imagens/fmc_fbpn.jpg" alt="Logo FMC" class="fmc-logo">
+    <h2>FACULDADE DE MEDICINA DE CAMPOS</h2>
+    <p style="font-size: 11px; opacity: 0.6; text-transform: uppercase;">Prática de Clínica Médica I</p>
+  </div>
 
-  <div style="background: var(--card); padding: 20px; border-radius: 15px;">
-    <h3>Progresso do Estágio</h3>
-    <div id="progressoTexto">0 / 20 Encontros</div>
-    <div class="progress-bar"><div id="barra" class="fill"></div></div>
+  <div class="ficha-box">
+    <div class="ficha-titulo">Ficha Individual de Estágio</div>
     
-    <div class="grid-dots" id="grid"></div>
+    <div class="info-row"><b>Aluno:</b> <span id="n">...</span></div>
+    <div class="info-row"><b>Matrícula:</b> <span id="r">...</span></div>
+
+    <div id="statusTxt" style="text-align: center; margin-top: 15px; font-size: 24px; font-weight: bold;">0 / 20</div>
+    
+    <div class="grid-presenca" id="grid"></div>
+
+    <h4 style="font-size: 12px; color: var(--azul); margin-top: 20px;">HISTÓRICO RECENTE</h4>
+    <div id="historico" class="historico-lista">
+      <p style="font-size: 11px; opacity: 0.4;">Buscando registros...</p>
+    </div>
   </div>
 
   <script>
-    const URL_API = "SUA_URL_AQUI"; // <--- MESMO LINK DO GOOGLE SCRIPT
+    const API = "https://script.google.com/macros/s/AKfycbxXa9mU4-mjfQX0Ao6E0VPVWxEV2R87L0XYtPf2VzyU_tOitK3combG3lm_Z_ZyhBAI/exec";
     const params = new URLSearchParams(window.location.search);
     const ra = params.get("ra");
-    const nome = params.get("nome");
 
-    document.getElementById("userNome").textContent = decodeURIComponent(nome);
-    document.getElementById("userRA").textContent = ra;
+    document.getElementById("n").innerText = decodeURIComponent(params.get("nome") || "---");
+    document.getElementById("r").innerText = ra || "---";
 
-    // Criar os 20 quadradinhos
     const grid = document.getElementById("grid");
     for(let i=1; i<=20; i++) {
       const d = document.createElement("div");
-      d.className = "dot"; d.id = "d"+i; d.textContent = i;
+      d.className = "dot"; d.id = "dot"+i; d.innerText = i;
       grid.appendChild(d);
     }
 
     async function carregar() {
+      if(!ra) return;
       try {
-        const resp = await fetch(`${URL_API}?action=aluno&ra=${ra}`);
+        const resp = await fetch(`${API}?action=aluno&ra=${ra}`);
         const data = await resp.json();
-        const total = data.registros.length;
+        const regs = data.registros || [];
         
-        document.getElementById("progressoTexto").textContent = `${total} / 20 Encontros`;
-        document.getElementById("barra").style.width = (total/20*100) + "%";
+        document.getElementById("statusTxt").innerText = `${regs.length} / 20`;
 
-        for(let i=1; i<=total; i++) {
-          document.getElementById("d"+i).className = "dot active";
+        for(let i=1; i<=regs.length; i++) {
+          const dot = document.getElementById("dot"+i);
+          if(dot) dot.className = "dot on";
         }
-      } catch(e) { console.error("Erro ao carregar dados"); }
+
+        document.getElementById("historico").innerHTML = regs.map((reg, idx) => `
+          <div class="item-h">
+            <div class="info">
+              <b>${idx+1}. ${reg.hospital}</b>
+              <span>${reg.data} (${reg.diaSemana})</span>
+            </div>
+            <div class="badge-p">${reg.periodo}</div>
+          </div>
+        `).join('');
+      } catch(e) { console.error(e); }
     }
-    carregar();
+    window.onload = carregar;
   </script>
 </body>
 </html>
