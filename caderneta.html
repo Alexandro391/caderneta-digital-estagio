@@ -1,262 +1,262 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <title>Caderneta Digital de Estágio</title>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --verde: #00C896; --verde-escuro: #00A878; --azul: #0090FF; --amarelo: #FFD60A; --roxo: #9B6FFF;
-      --fundo: #0A0F0D; --superficie: #111A15; --superficie2: #162019; --borda: #1E3028;
-      --texto: #E8F5EE; --texto-suave: #7AAB8A; --mono: 'Space Mono', monospace; --sans: 'DM Sans', sans-serif;
-      --cor-periodo: var(--verde); /* Dinâmico */
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Caderneta FMC · Aluno</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>
+// ── CONFIGURAÇÃO ─────────────────────────────────────────────
+const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby6aS95ywHvv7Zkpt1RuiU6ACVui3i8c7seqxlNjsyL3nBwR5fxOUx284hZkFPvHM8j/exec";
+const TOTAL_PLANTOES = 20;
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: var(--fundo); color: var(--texto); font-family: var(--sans); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 0 0 60px; overflow-x: hidden; }
-    body::before { content: ''; position: fixed; inset: 0; background-image: linear-gradient(rgba(0,200,150,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,200,150,0.03) 1px, transparent 1px); background-size: 40px 40px; pointer-events: none; z-index: 0; }
+const COR = {
+  "5º Período":  { p:"#1D4ED8", l:"#DBEAFE", g:"linear-gradient(135deg,#1D4ED8,#3B82F6)", emoji:"🔵" },
+  "6º Período":  { p:"#0891B2", l:"#CFFAFE", g:"linear-gradient(135deg,#0891B2,#22D3EE)", emoji:"🩵" },
+  "7º Período":  { p:"#059669", l:"#D1FAE5", g:"linear-gradient(135deg,#059669,#34D399)", emoji:"🟢" },
+  "8º Período":  { p:"#166534", l:"#DCFCE7", g:"linear-gradient(135deg,#166534,#16A34A)", emoji:"💚" }
+};
 
-    header { width: 100%; max-width: 520px; padding: 36px 24px 0; position: relative; z-index: 1; animation: fadeDown 0.6s ease both; }
-    .badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(0,200,150,0.1); border: 1px solid rgba(0,200,150,0.25); border-radius: 100px; padding: 4px 12px; font-family: var(--mono); font-size: 10px; color: var(--cor-periodo); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 16px; }
-    h1 { font-family: var(--mono); font-size: clamp(22px, 6vw, 28px); font-weight: 700; color: var(--texto); line-height: 1.2; }
-    h1 span { color: var(--cor-periodo); }
-    .subtitulo { font-size: 13px; color: var(--texto-suave); margin-top: 6px; }
+const ESPECIALIDADES = {
+  "5º Período":  ["Clínica Médica I"],
+  "6º Período":  ["Clínica Médica II"],
+  "7º Período":  ["Pediatria I","Clínica Cirúrgica","Obstetrícia","Ginecologia","Medicina Intensiva","DIP"],
+  "8º Período":  ["Pediatria II","Clínica Cirúrgica II","Urologia","Oftalmologia","Otorrinolaringologia","Dermatologia","Ortopedia e Traumatologia"]
+};
+</script>
+<style>
+:root{
+  --p:#1D4ED8;--pl:#DBEAFE;--pg:linear-gradient(135deg,#1D4ED8,#3B82F6);
+  --fmc-v:#3A7D44;--fmc-vd:#1E5128;--fmc-vl:#D6EDD9;
+  --g100:#F1F5F9;--g200:#E2E8F0;--g400:#94A3B8;--g700:#334155;--g900:#0F172A;
+  --font:'Sora',sans-serif;--r:16px;--sh:0 4px 24px rgba(0,0,0,.09);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--g100);color:var(--g900);min-height:100vh}
+.screen{display:none}.screen.on{display:block;animation:up .3s ease}
+@keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
-    .card-aluno { width: calc(100% - 48px); max-width: 520px; margin: 28px 0 0; padding: 20px 22px; background: var(--superficie); border: 1px solid var(--borda); border-radius: 16px; position: relative; z-index: 1; animation: fadeUp 0.6s 0.1s ease both; }
-    .card-aluno::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: var(--cor-periodo); }
-    .aluno-info { display: flex; align-items: center; gap: 14px; }
-    .avatar { width: 48px; height: 48px; background: var(--cor-periodo); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 18px; color: #000; font-weight: 700; transition: 0.3s; }
-    .aluno-nome { font-size: 17px; font-weight: 600; color: var(--texto); }
-    .aluno-ra { font-family: var(--mono); font-size: 12px; color: var(--cor-periodo); margin-top: 3px; }
+/* UI ELEMENTS */
+.topbar{color:white;padding:0 18px;height:58px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:50;box-shadow:0 2px 16px rgba(0,0,0,.22)}
+.tb-title{font-size:14px;font-weight:700}
+.tb-sub{font-size:10px;opacity:0.7}
+.tb-back{margin-left:auto;background:rgba(255,255,255,.15);border:none;color:white;border-radius:99px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer}
 
-    form { width: 100%; max-width: 520px; padding: 0 24px; position: relative; z-index: 1; animation: fadeUp 0.6s 0.2s ease both; }
-    .secao { margin-top: 28px; }
-    .secao-titulo { font-family: var(--mono); font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--texto-suave); margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
-    .secao-titulo::after { content: ''; flex: 1; height: 1px; background: var(--borda); }
-    .campo { margin-bottom: 14px; }
-    label { display: block; font-size: 11px; font-weight: 600; color: var(--texto-suave); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 7px; }
-    input, select { width: 100%; background: var(--superficie2); border: 1px solid var(--borda); border-radius: 10px; padding: 13px 16px; color: var(--texto); font-family: var(--sans); font-size: 15px; outline: none; }
-    input:read-only { opacity: 0.6; cursor: not-allowed; }
+.container{max-width:480px;margin:0 auto;padding:20px 16px}
+.card{background:white;border-radius:var(--r);border:1px solid var(--g200);box-shadow:var(--sh);margin-bottom:16px;overflow:hidden}
+.card-head{padding:15px 20px;border-bottom:1px solid var(--g100);display:flex;align-items:center;gap:8px}
+.card-body{padding:20px}
 
-    .btn-registrar { width: 100%; background: var(--cor-periodo); color: #000; border: none; border-radius: 12px; padding: 17px; font-family: var(--mono); font-size: 14px; font-weight: 700; text-transform: uppercase; cursor: pointer; margin-top: 28px; transition: 0.3s; }
-    .btn-registrar:disabled { opacity: 0.5; filter: grayscale(1); }
+/* LOGIN SCREEN */
+.login-wrap{min-height:100vh;background:linear-gradient(160deg,#1E5128 0%,#3A7D44 100%);padding:40px 20px}
+.banner{text-align:center;color:white;margin-bottom:30px}
+.banner h1{font-size:20px;margin-bottom:5px}
+.banner p{font-size:12px;opacity:0.7}
+.lcard{background:rgba(255,255,255,0.1);backdrop-filter:blur(10px);padding:25px;border-radius:20px;border:1px solid rgba(255,255,255,0.2)}
+.fg{margin-bottom:15px}
+.fg label{display:block;font-size:11px;font-weight:700;margin-bottom:5px;text-transform:uppercase;color:rgba(255,255,255,0.7)}
+.fg.lt label{color:var(--g700)}
+.fg input, .fg select{width:100%;padding:12px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:white;font-family:var(--font)}
+.fg.lt input, .fg.lt select{background:var(--g100);color:var(--g900);border-color:var(--g200)}
+.periodo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:20px}
+.pbtn{padding:10px;border-radius:10px;border:2px solid transparent;background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:10px;font-weight:700}
+.pbtn.sel{border-color:white;background:rgba(255,255,255,0.3)}
 
-    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); z-index: 100; display: none; align-items: center; justify-content: center; padding: 24px; }
-    .overlay.ativo { display: flex; }
-    .modal { background: var(--superficie); border-radius: 24px; padding: 40px 32px; max-width: 340px; text-align: center; border: 1px solid var(--borda); }
-    .erro-msg { color: #FF8080; font-size: 12px; margin-top: 10px; font-family: var(--mono); display: none; }
-    .erro-msg.visivel { display: block; }
+/* PROGRESS HERO */
+.hero{border-radius:var(--r);padding:20px;color:white;margin-bottom:16px;position:relative}
+.hero-num{font-size:40px;font-weight:800}
+.prog-track{height:8px;background:rgba(255,255,255,0.2);border-radius:10px;margin:10px 0}
+.prog-fill{height:100%;background:white;border-radius:10px;transition:width 1s}
 
-    @keyframes fadeDown { from { opacity: 0; transform: translateY(-16px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-  </style>
+/* BUTTONS */
+.btn{width:100%;padding:15px;border-radius:12px;border:none;font-weight:800;cursor:pointer;font-family:var(--font)}
+.btn-login{background:white;color:var(--fmc-vd)}
+.btn-p{background:var(--p);color:white}
+.btn:disabled{opacity:0.5;cursor:not-allowed}
+
+/* HISTÓRICO */
+.hrow{padding:12px 16px;border-bottom:1px solid var(--g100);display:flex;align-items:center;gap:12px}
+.hinfo{flex:1}
+.hdata{font-size:13px;font-weight:700}
+.hlocal{font-size:11px;color:var(--g400)}
+
+.loading-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:none;align-items:center;justify-content:center;color:white;z-index:100}
+.loading-overlay.on{display:flex}
+</style>
 </head>
 <body>
 
-  <header>
-    <div class="badge" id="statusBadge">Link Pessoal</div>
-    <h1>Caderneta<br><span>Digital</span></h1>
-    <p class="subtitulo">Registro de Escala de Estágio Hospitalar</p>
-  </header>
+<div class="loading-overlay" id="loading">Carregando...</div>
 
-  <div class="card-aluno">
-    <div class="aluno-info">
-      <div class="avatar" id="avatarLetra">?</div>
-      <div>
-        <div class="aluno-nome" id="nomeAluno">Identifique-se via QR Code</div>
-        <div class="aluno-ra" id="raAluno">Aguardando RA...</div>
+<div id="screen-login" class="screen on">
+  <div class="login-wrap">
+    <div class="banner">
+      <h1>FMC</h1>
+      <p>Caderneta Digital de Estágio</p>
+    </div>
+    <div class="lcard">
+      <div class="fg">
+        <label>Matrícula (RA)</label>
+        <input type="number" id="login-ra" placeholder="Digite seu RA">
       </div>
+      <div class="fg">
+        <label>Nome Completo</label>
+        <input type="text" id="login-nome" placeholder="Seu nome">
+      </div>
+      <label style="font-size:11px; color:white; margin-bottom:10px; display:block">PERÍODO</label>
+      <div class="periodo-grid">
+        <button class="pbtn sel" data-p="5º Período" onclick="selPeriodo(this)">5º</button>
+        <button class="pbtn" data-p="6º Período" onclick="selPeriodo(this)">6º</button>
+        <button class="pbtn" data-p="7º Período" onclick="selPeriodo(this)">7º</button>
+        <button class="pbtn" data-p="8º Período" onclick="selPeriodo(this)">8º</button>
+      </div>
+      <button class="btn btn-login" onclick="fazerLogin()">ACESSAR CADERNETA</button>
     </div>
   </div>
+</div>
 
-  <form id="formEstagio" onsubmit="enviar(event)">
-    <input type="hidden" id="nomeOculto">
-    <input type="hidden" id="raOculto">
+<div id="screen-menu" class="screen">
+  <div class="topbar" id="tb-menu">
+    <div><div class="tb-title" id="tb-nome">—</div><div class="tb-sub" id="tb-sub">—</div></div>
+    <button class="tb-back" onclick="sair()">Sair</button>
+  </div>
+  <div class="container">
+    <div id="hero-area"></div>
+    <button class="btn btn-p" onclick="irReg()" style="margin-bottom:12px">+ REGISTRAR PLANTÃO</button>
+    <div class="card">
+      <div class="card-head"><b>Histórico Recente</b></div>
+      <div id="lista-hist"></div>
+    </div>
+  </div>
+</div>
 
-    <div class="secao">
-      <div class="secao-titulo">01 / Local e Período</div>
-      
-      <div class="campo">
-        <label>Período Acadêmico</label>
-        <select id="periodo" required onchange="atualizarCores()">
-          <option value="">Selecione...</option>
-          <option value="5">5º Período</option>
-          <option value="6">6º Período</option>
-          <option value="7">7º Período</option>
-          <option value="8">8º Período</option>
-        </select>
-      </div>
-
-      <div class="campo">
-        <label>Unidade Hospitalar</label>
-        <select id="hospital" required>
-          <option value="">Onde você está?</option>
-          <option>Hospital Regional</option>
-          <option>Hospital Central</option>
-          <option>Santa Casa</option>
-          <option>UPA 24h</option>
-          <option>Hospital Universitário</option>
-        </select>
-      </div>
-      
-      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-        <div class="campo">
-          <label>Data</label>
-          <input type="date" id="dataEstagio" required>
-        </div>
-        <div class="campo">
-          <label>Semana</label>
-          <select id="diaSemana" required>
-            <option>Segunda-feira</option>
-            <option>Terça-feira</option>
-            <option>Quarta-feira</option>
-            <option>Quinta-feira</option>
-            <option>Sexta-feira</option>
-            <option>Sábado</option>
-            <option>Domingo</option>
+<div id="screen-reg" class="screen">
+  <div class="topbar" id="tb-reg">
+    <div class="tb-title">Novo Registro</div>
+    <button class="tb-back" onclick="ir('screen-menu')">Voltar</button>
+  </div>
+  <div class="container">
+    <div class="card">
+      <div class="card-body">
+        <div class="fg lt"><label>Hospital</label>
+          <select id="r-hosp">
+            <option value="">Selecionar...</option>
+            <option>Hospital Ferreira Machado</option>
+            <option>Hospital de Guarus</option>
+            <option>Santa Casa</option>
+            <option>UPA 24h</option>
           </select>
         </div>
+        <div class="fg lt"><label>Especialidade</label><select id="r-setor"></select></div>
+        <div class="fg lt"><label>Preceptor</label><input type="text" id="r-prec" placeholder="Nome do Médico"></div>
+        <div class="fg lt"><label>Token do Dia</label><input type="password" id="r-token" style="text-align:center; font-size:20px" placeholder="••••"></div>
+        <button class="btn btn-p" id="btn-salvar" onclick="salvarPlantao()">CONFIRMAR PRESENÇA</button>
       </div>
-    </div>
-
-    <div class="secao">
-      <div class="secao-titulo">02 / Validação do Preceptor</div>
-      <div class="campo">
-        <label>Médico Responsável</label>
-        <select id="professor" required>
-          <option value="">Selecione o preceptor...</option>
-          <option>Dr. Marcos Andrade</option>
-          <option>Dra. Helena Costa</option>
-          <option>Dr. Ricardo Lima</option>
-          <option>Dr. Carlos Mendes</option>
-        </select>
-      </div>
-      
-      <div class="campo" style="background: rgba(255,255,255,0.03); padding: 20px; border-radius: 12px; border: 1px solid var(--borda);">
-        <label style="text-align: center; display: block; margin-bottom: 12px;">Digite o código de 6 dígitos do Preceptor</label>
-        <input type="text" id="codigoPreceptor" placeholder="000 000" maxlength="7" style="text-align: center; font-family: var(--mono); font-size: 24px; letter-spacing: 4px; border-color: var(--cor-periodo);" required>
-        <div class="erro-msg" id="erroMsg">❌ Código expirado ou incorreto</div>
-      </div>
-    </div>
-
-    <button type="submit" class="btn-registrar" id="btnEnviar">Confirmar Presença</button>
-  </form>
-
-  <div class="overlay" id="overlaySuccesso">
-    <div class="modal">
-      <div style="font-size: 60px;">✅</div>
-      <h2 style="margin-top: 10px;">Registrado!</h2>
-      <p style="color: var(--texto-suave); margin-top: 8px; font-size: 14px;">Sua presença foi enviada para o Dashboard da coordenação.</p>
-      <button onclick="location.reload()" style="margin-top: 24px; width: 100%; padding: 12px; border-radius: 8px; border: none; background: var(--cor-periodo); font-weight: bold; cursor: pointer;">Concluir</button>
     </div>
   </div>
+</div>
 
-  <script>
-    const URL_PLANILHA = "https://script.google.com/macros/s/AKfycbxXa9mU4-mjfQX0Ao6E0VPVWxEV2R87L0XYtPf2VzyU_tOitK3combG3lm_Z_ZyhBAI/exec";    
-    // Chaves idênticas ao Painel do Token
-    const CHAVES = {
-      5: "MED5-ALPHA-2026",
-      6: "MED6-BETA-2026",
-      7: "MED7-GAMMA-2026",
-      8: "MED8-DELTA-2026"
-    };
+<script>
+let USER = JSON.parse(localStorage.getItem('fmc_user')) || null;
+let PERIODO_SEL = "5º Período";
 
-    // Captura dados da URL (QR Code)
-    const params = new URLSearchParams(window.location.search);
-    const nomeUrl = params.get("nome");
-    const raUrl = params.get("ra");
-    const periodoUrl = params.get("periodo");
+window.onload = () => { if(USER) { loginSucesso(); } };
 
-    if (nomeUrl) {
-      document.getElementById("nomeAluno").textContent = decodeURIComponent(nomeUrl);
-      document.getElementById("nomeOculto").value = decodeURIComponent(nomeUrl);
-      document.getElementById("avatarLetra").textContent = nomeUrl.charAt(0).toUpperCase();
-    }
-    if (raUrl) {
-      document.getElementById("raAluno").textContent = "RA: " + raUrl;
-      document.getElementById("raOculto").value = raUrl;
-    }
-    if (periodoUrl) {
-      const selectP = document.getElementById("periodo");
-      selectP.value = periodoUrl;
-      selectP.style.pointerEvents = "none"; // Trava para o aluno não mudar
-      atualizarCores();
-    }
+function ir(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+}
 
-    // Define data de hoje
-    document.getElementById("dataEstagio").value = new Date().toISOString().split("T")[0];
+function selPeriodo(btn) {
+  document.querySelectorAll('.pbtn').forEach(b => b.classList.remove('sel'));
+  btn.classList.add('sel');
+  PERIODO_SEL = btn.getAttribute('data-p');
+}
 
-    function atualizarCores() {
-      const p = document.getElementById("periodo").value;
-      const cores = { "5": "#00C2FF", "6": "#00D48A", "7": "#FFB800", "8": "#9B6FFF" };
-      const corAtiva = cores[p] || "#00C896";
-      document.documentElement.style.setProperty('--cor-periodo', corAtiva);
-    }
+function fazerLogin() {
+  const ra = document.getElementById('login-ra').value;
+  const nome = document.getElementById('login-nome').value;
+  if(!ra || !nome) return alert("Preencha tudo!");
+  USER = { ra, nome, periodo: PERIODO_SEL };
+  localStorage.setItem('fmc_user', JSON.stringify(USER));
+  loginSucesso();
+}
 
-    // Gerador de Hash (Igual ao do Preceptor)
-    function gerarTokenCorreto(periodo) {
-      const INTERVALO = 5 * 60;
-      const janela = Math.floor(Math.floor(Date.now() / 1000) / INTERVALO);
-      const semente = janela + "|" + (CHAVES[periodo] || "");
-      
-      let hash = 5381;
-      for (let i = 0; i < semente.length; i++) {
-        hash = ((hash << 5) + hash) ^ semente.charCodeAt(i);
-        hash = hash & hash;
-      }
-      
-      const CHARS = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
-      let token = "";
-      let n = Math.abs(hash);
-      for (let i = 0; i < 6; i++) {
-        token += CHARS[n % CHARS.length];
-        n = Math.floor(n / CHARS.length) + (i * 13);
-      }
-      return token;
-    }
+function loginSucesso() {
+  document.getElementById('tb-nome').innerText = USER.nome;
+  document.getElementById('tb-sub').innerText = `RA: ${USER.ra} • ${USER.periodo}`;
+  document.getElementById('tb-menu').style.background = COR[USER.periodo].p;
+  carregarDados();
+  ir('screen-menu');
+}
 
-    function enviar(e) {
-      e.preventDefault();
-      const periodo = document.getElementById("periodo").value;
-      const tokenDigitado = document.getElementById("codigoPreceptor").value.toUpperCase().replace(/\s/g, '');
-      const tokenCorreto = gerarTokenCorreto(periodo);
-      const erro = document.getElementById("erroMsg");
+async function carregarDados() {
+  try {
+    const res = await fetch(`${APPS_SCRIPT_URL}?action=aluno&ra=${USER.ra}`);
+    const data = await res.json();
+    const lista = data.registros || [];
+    renderizarProgresso(lista.length);
+    renderizarLista(lista);
+  } catch(e) { console.log("Erro ao carregar"); }
+}
 
-      if (tokenDigitado !== tokenCorreto) {
-        erro.classList.add("visivel");
-        return;
-      }
+function renderizarProgresso(qtd) {
+  const pct = Math.min(100, (qtd/TOTAL_PLANTOES)*100);
+  const cor = COR[USER.periodo];
+  document.getElementById('hero-area').innerHTML = `
+    <div class="hero" style="background:${cor.g}">
+      <div class="hero-num">${qtd}/${TOTAL_PLANTOES}</div>
+      <div style="font-size:12px; opacity:0.8">Plantões registrados</div>
+      <div class="prog-track"><div class="prog-fill" style="width:${pct}%"></div></div>
+    </div>`;
+}
 
-      erro.classList.remove("visivel");
-      const btn = document.getElementById("btnEnviar");
-      btn.disabled = true;
-      btn.textContent = "Validando...";
+function renderizarLista(lista) {
+  const cont = document.getElementById('lista-hist');
+  if(lista.length === 0) return cont.innerHTML = '<p style="padding:20px; text-align:center; font-size:12px; color:#999">Nenhum registro.</p>';
+  cont.innerHTML = lista.map(r => `
+    <div class="hrow">
+      <div class="hinfo"><div class="hdata">${r.data}</div><div class="hlocal">${r.hospital}</div></div>
+      <div style="font-size:10px; font-weight:bold; color:green">CONFIRMADO</div>
+    </div>`).join('');
+}
 
-      const dados = {
-        nome: document.getElementById("nomeOculto").value,
-        matricula: document.getElementById("raOculto").value,
-        periodo: periodo + "º Período",
-        dataEstagio: document.getElementById("dataEstagio").value,
-        diaSemana: document.getElementById("diaSemana").value,
-        hospital: document.getElementById("hospital").value,
-        professor: document.getElementById("professor").value
-      };
+function irReg() {
+  const sel = document.getElementById('r-setor');
+  const lista = ESPECIALIDADES[USER.periodo] || [];
+  sel.innerHTML = lista.map(e => `<option>${e}</option>`).join('');
+  document.getElementById('tb-reg').style.background = COR[USER.periodo].p;
+  ir('screen-reg');
+}
 
-      fetch(URL_PLANILHA, {
-        method: "POST",
-        mode: "no-cors",
-        body: JSON.stringify(dados)
-      })
-      .then(() => {
-        document.getElementById("overlaySuccesso").classList.add("ativo");
-      })
-      .catch(() => alert("Erro de conexão"))
-      .finally(() => {
-        btn.disabled = false;
-        btn.textContent = "Confirmar Presença";
-      });
-    }
-  </script>
+async function salvarPlantao() {
+  const btn = document.getElementById('btn-salvar');
+  const dados = {
+    nome: USER.nome, matricula: USER.ra, periodo: USER.periodo,
+    dataEstagio: new Date().toLocaleDateString('pt-BR'),
+    diaSemana: new Date().toLocaleDateString('pt-BR', {weekday:'long'}),
+    hospital: document.getElementById('r-hosp').value,
+    professor: document.getElementById('r-prec').value,
+    tokenProfessor: document.getElementById('r-token').value
+  };
+
+  if(!dados.hospital || !dados.professor || !dados.tokenProfessor) return alert("Preencha tudo!");
+
+  btn.disabled = true;
+  btn.innerText = "PROCESSANDO...";
+  document.getElementById('loading').classList.add('on');
+
+  try {
+    await fetch(APPS_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(dados) });
+    alert("Presença Registrada!");
+    location.reload(); 
+  } catch(e) {
+    alert("Erro ao salvar.");
+    btn.disabled = false;
+  }
+}
+
+function sair() { if(confirm("Sair da conta?")) { localStorage.clear(); location.reload(); } }
+</script>
 </body>
 </html>
