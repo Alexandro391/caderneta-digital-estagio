@@ -2,147 +2,63 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-  <title>Caderneta Digital - FMC</title>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Controle de Estágio</title>
   <style>
-    :root { --verde: #00C896; --fundo: #0A0F0D; --superficie: #111A15; --borda: #1E3028; --texto: #E8F5EE; }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: var(--fundo); color: var(--texto); font-family: 'DM Sans', sans-serif; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-    
-    /* CABEÇALHO FMC CONFORME A FOTO */
-    .fmc-header { text-align: center; margin-bottom: 25px; width: 100%; max-width: 480px; border-bottom: 1px solid var(--borda); padding-bottom: 20px; }
-    .fmc-logo { width: 120px; height: auto; margin-bottom: 10px; filter: brightness(0) invert(1); } /* Invertido para o tema dark */
-    .fmc-header h2 { font-size: 16px; letter-spacing: 1px; color: white; margin-bottom: 4px; }
-    .fmc-header p { font-size: 11px; opacity: 0.7; text-transform: uppercase; margin-bottom: 2px; }
-    .fmc-header .disciplina { font-size: 14px; font-weight: bold; color: var(--verde); margin-top: 8px; }
-
-    .card-aluno { background: var(--superficie); border: 1px solid var(--borda); border-radius: 12px; padding: 15px; width: 100%; max-width: 480px; margin-bottom: 20px; text-align: center; }
-    .nome-destaque { font-size: 18px; font-weight: bold; color: white; display: block; }
-    .ra-destaque { font-size: 13px; opacity: 0.6; }
-
-    form { width: 100%; max-width: 480px; }
-    .campo { margin-bottom: 15px; }
-    label { display: block; font-size: 10px; color: var(--verde); text-transform: uppercase; font-weight: bold; margin-bottom: 5px; }
-    input, select { width: 100%; padding: 12px; background: #162019; border: 1px solid var(--borda); border-radius: 8px; color: white; font-size: 15px; outline: none; }
-    input[readonly] { opacity: 0.5; cursor: not-allowed; }
-    
-    .btn { width: 100%; padding: 16px; background: var(--verde); border: none; border-radius: 10px; color: #000; font-weight: bold; font-size: 16px; cursor: pointer; transition: 0.3s; }
-    .btn:disabled { opacity: 0.3; }
-    .btn-progresso { display: block; text-align: center; margin-top: 15px; text-decoration: none; color: var(--verde); font-size: 13px; border: 1px solid var(--verde); padding: 10px; border-radius: 8px; }
+    :root { --azul: #00C2FF; --fundo: #05080A; --card: #0F1923; }
+    body { background: var(--fundo); color: white; font-family: sans-serif; padding: 20px; }
+    .grid-dots { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 20px 0; }
+    .dot { height: 40px; border: 2px solid #1C2E3D; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #3A5570; }
+    .dot.active { background: var(--azul); border-color: var(--azul); color: black; font-weight: bold; }
+    .progress-bar { width: 100%; height: 10px; background: #1C2E3D; border-radius: 5px; overflow: hidden; }
+    .fill { height: 100%; background: var(--azul); width: 0%; transition: 1s; }
   </style>
 </head>
 <body>
 
-  <div class="fmc-header">
-    <img src="https://alexandro391.github.io/caderneta-digital-estagio/imagens/fmc_fbpn.jpg" alt="Logo FMC" class="fmc-logo">
-    <h2>FACULDADE DE MEDICINA DE CAMPOS</h2>
-    <p>Fundação Benedito Pereira Nunes</p>
-    <p class="disciplina">PRÁTICA DE CLÍNICA MÉDICA I</p>
+  <h2>Olá, <span id="userNome">...</span></h2>
+  <p>RA: <span id="userRA">...</span></p>
+
+  <div style="background: var(--card); padding: 20px; border-radius: 15px;">
+    <h3>Progresso do Estágio</h3>
+    <div id="progressoTexto">0 / 20 Encontros</div>
+    <div class="progress-bar"><div id="barra" class="fill"></div></div>
+    
+    <div class="grid-dots" id="grid"></div>
   </div>
-
-  <div class="card-aluno">
-    <span class="nome-destaque" id="exibeNome">Carregando...</span>
-    <span class="ra-destaque" id="exibeRA">RA: ----</span>
-  </div>
-
-  <form id="formEstagio">
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-      <div class="campo">
-        <label>Data</label>
-        <input type="text" id="dataHoje" readonly>
-      </div>
-      <div class="campo">
-        <label>Dia da Semana</label>
-        <input type="text" id="diaSemana" readonly>
-      </div>
-    </div>
-
-    <div class="campo">
-      <label>Período do Aluno</label>
-      <input type="text" id="periodoAluno" readonly>
-    </div>
-
-    <div class="campo">
-      <label>Hospital / Unidade</label>
-      <select id="hospital" required>
-        <option value="">Selecione o local...</option>
-        <option>Hospital Regional</option>
-        <option>Hospital Central</option>
-        <option>Santa Casa</option>
-        <option>UPA 24h</option>
-      </select>
-    </div>
-
-    <div class="campo">
-      <label>Preceptor Responsável</label>
-      <select id="professor" required>
-        <option value="">Selecione o médico...</option>
-        <option>Dr. Marcos Andrade</option>
-        <option>Dra. Helena Costa</option>
-        <option>Dr. Ricardo Lima</option>
-      </select>
-    </div>
-
-    <div class="campo" style="background: rgba(255,214,10,0.05); padding: 15px; border-radius: 10px; border: 1px solid rgba(255,214,10,0.2);">
-      <label style="color: #FFD60A; text-align: center;">Senha do Dia</label>
-      <input type="password" id="senha" placeholder="••••" style="text-align: center; font-size: 24px; letter-spacing: 6px;" required>
-    </div>
-
-    <button type="submit" id="btn" class="btn">CONFIRMAR PRESENÇA</button>
-    <a id="linkControle" class="btn-progresso" href="#">VER MEU PROGRESSO</a>
-  </form>
 
   <script>
-    const API_URL = "https://script.google.com/macros/s/AKfycbxXa9mU4-mjfQX0Ao6E0VPVWxEV2R87L0XYtPf2VzyU_tOitK3combG3lm_Z_ZyhBAI/exec";
-    
-    function setup() {
-      const urlParams = new URLSearchParams(window.location.search);
-      const nome = urlParams.get("nome");
-      const ra = urlParams.get("ra");
-      const periodo = urlParams.get("periodo") || "5";
+    const URL_API = "SUA_URL_AQUI"; // <--- MESMO LINK DO GOOGLE SCRIPT
+    const params = new URLSearchParams(window.location.search);
+    const ra = params.get("ra");
+    const nome = params.get("nome");
 
-      if (nome && ra) {
-        document.getElementById("exibeNome").innerText = decodeURIComponent(nome);
-        document.getElementById("exibeRA").innerText = "RA: " + ra;
-        document.getElementById("periodoAluno").value = periodo + "º Período";
-        document.getElementById("linkControle").href = `controle.html?nome=${nome}&ra=${ra}&periodo=${periodo}`;
-      }
+    document.getElementById("userNome").textContent = decodeURIComponent(nome);
+    document.getElementById("userRA").textContent = ra;
 
-      const hoje = new Date();
-      const dias = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
-      document.getElementById("dataHoje").value = hoje.toLocaleDateString('pt-BR');
-      document.getElementById("diaSemana").value = dias[hoje.getDay()];
+    // Criar os 20 quadradinhos
+    const grid = document.getElementById("grid");
+    for(let i=1; i<=20; i++) {
+      const d = document.createElement("div");
+      d.className = "dot"; d.id = "d"+i; d.textContent = i;
+      grid.appendChild(d);
     }
 
-    window.onload = setup;
-
-    document.getElementById("formEstagio").onsubmit = async (e) => {
-      e.preventDefault();
-      const btn = document.getElementById("btn");
-      const urlParams = new URLSearchParams(window.location.search);
-      btn.disabled = true; btn.textContent = "ENVIANDO...";
-
-      const payload = {
-        nome: decodeURIComponent(urlParams.get("nome")),
-        matricula: urlParams.get("ra"),
-        periodo: document.getElementById("periodoAluno").value,
-        dataEstagio: document.getElementById("dataHoje").value,
-        diaSemana: document.getElementById("diaSemana").value,
-        hospital: document.getElementById("hospital").value,
-        professor: document.getElementById("professor").value,
-        tokenProfessor: document.getElementById("senha").value
-      };
-
+    async function carregar() {
       try {
-        await fetch(API_URL, { method: "POST", mode: "no-cors", body: JSON.stringify(payload) });
-        alert("Presença enviada com sucesso!");
-        window.location.href = `controle.html?nome=${urlParams.get("nome")}&ra=${urlParams.get("ra")}`;
-      } catch (err) {
-        alert("Erro de conexão.");
-        btn.disabled = false; btn.textContent = "CONFIRMAR PRESENÇA";
-      }
-    };
+        const resp = await fetch(`${URL_API}?action=aluno&ra=${ra}`);
+        const data = await resp.json();
+        const total = data.registros.length;
+        
+        document.getElementById("progressoTexto").textContent = `${total} / 20 Encontros`;
+        document.getElementById("barra").style.width = (total/20*100) + "%";
+
+        for(let i=1; i<=total; i++) {
+          document.getElementById("d"+i).className = "dot active";
+        }
+      } catch(e) { console.error("Erro ao carregar dados"); }
+    }
+    carregar();
   </script>
 </body>
 </html>
