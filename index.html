@@ -26,7 +26,6 @@ h2{font-size:13px;font-weight:400;color:rgba(255,255,255,.65);margin-bottom:6px;
 .rcard:hover{background:rgba(255,255,255,.15);transform:translateY(-2px);box-shadow:0 12px 40px rgba(0,0,0,.3)}
 .rcard:active{transform:scale(.97)}
 .rcard-icon{font-size:32px;flex-shrink:0;width:52px;height:52px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.1);border-radius:14px;border:1px solid rgba(255,255,255,.15)}
-.rcard-text{}
 .rcard-title{font-size:15px;font-weight:800;color:white;margin-bottom:3px}
 .rcard-sub{font-size:12px;color:rgba(255,255,255,.5)}
 .rcard-arrow{margin-left:auto;font-size:18px;color:rgba(255,255,255,.35);flex-shrink:0}
@@ -37,7 +36,7 @@ footer{text-align:center;padding:20px;font-size:11px;color:rgba(255,255,255,.2);
 <body>
 <div class="wrap">
   <div class="logo-wrap">
-    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" width="100" height="100">
+    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" width="100" height="100" aria-label="Logo FMC">
       <circle cx="100" cy="100" r="100" fill="#3A7D44"/>
       <circle cx="38" cy="118" r="9" fill="white"/>
       <path d="M56 82 Q56 62 76 62 L86 62 L86 74 L78 74 Q70 74 70 82 L70 92 L84 92 L84 104 L70 104 L70 140 L56 140 Z" fill="white"/>
@@ -72,9 +71,10 @@ footer{text-align:center;padding:20px;font-size:11px;color:rgba(255,255,255,.2);
 <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('service-worker.js')
-        .then(reg => console.log('Service Worker registrado!', reg))
-        .catch(err => console.log('Erro ao registrar Service Worker', err));
+      // Ajustado para 'sw.js' para coincidir com o nome do seu arquivo no GitHub
+      navigator.serviceWorker.register('sw.js')
+        .then(reg => console.log('Service Worker registrado com sucesso!', reg))
+        .catch(err => console.log('Falha ao registrar Service Worker:', err));
     });
   }
 </script>
