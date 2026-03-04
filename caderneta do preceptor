@@ -2,18 +2,11 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Caderneta FMC">
-<meta name="theme-color" content="#1E5128">
-<link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="1000281242.png">
-<title>Caderneta FMC · Preceptor</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Caderneta Digital FMC - Preceptor</title>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root{--fmc-v:#3A7D44;--fmc-vd:#1E5128;--fmc-vl:#D6EDD9;--g50:#F8FAFC;--g100:#F1F5F9;--g200:#E2E8F0;--g400:#94A3B8;--g500:#64748B;--g700:#334155;--g900:#0F172A;--font:'Sora',sans-serif;--mono:'DM Mono',monospace;--r:16px;--rsm:10px;--sh:0 4px 24px rgba(0,0,0,.09)}
+:root{--fmc-v:#3A7D44;--fmc-vd:#1E5128;--fmc-vl:#D6EDD9;--white:#FFF;--g50:#F8FAFC;--g100:#F1F5F9;--g200:#E2E8F0;--g400:#94A3B8;--g500:#64748B;--g700:#334155;--g900:#0F172A;--font:'Sora',sans-serif;--mono:'DM Mono',monospace;--r:16px;--rsm:10px;--sh:0 4px 24px rgba(0,0,0,.09)}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:var(--font);background:var(--g100);color:var(--g900);min-height:100vh}
 .screen{display:none}.screen.on{display:block;animation:up .3s ease}
@@ -21,8 +14,8 @@ body{font-family:var(--font);background:var(--g100);color:var(--g900);min-height
 .topbar{background:var(--fmc-vd);color:white;padding:0 18px;height:58px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:50;box-shadow:0 2px 16px rgba(0,0,0,.22)}
 .tb-logo{width:34px;height:34px;flex-shrink:0;border-radius:50%;object-fit:cover}
 .tb-title{font-size:14px;font-weight:700}.tb-sub{font-size:10.5px;color:rgba(255,255,255,.55)}
-.tb-back{margin-left:auto;background:rgba(255,255,255,.15);border:none;color:white;border-radius:99px;padding:6px 14px;font-family:var(--font);font-size:12px;font-weight:700;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.container{max-width:480px;margin:0 auto;padding:20px 16px 64px}
+.tb-back{margin-left:auto;background:rgba(255,255,255,.15);border:none;color:white;border-radius:99px;padding:6px 14px;font-family:var(--font);font-size:12px;font-weight:700;cursor:pointer}
+.container{max-width:480px;margin:0 auto;padding:20px 16px 48px}
 .card{background:white;border-radius:var(--r);border:1px solid var(--g200);box-shadow:var(--sh);overflow:hidden;margin-bottom:16px}
 .card-head{padding:15px 20px;border-bottom:1px solid var(--g100);display:flex;align-items:center;gap:9px}
 .card-head h2{font-size:14px;font-weight:700;color:var(--g900)}.card-body{padding:20px}
@@ -34,45 +27,35 @@ body{font-family:var(--font);background:var(--g100);color:var(--g900);min-height
 .banner .fbpn{font-size:11px;color:rgba(255,255,255,.45)}
 .banner .semestre{font-size:11px;color:rgba(255,255,255,.35);font-family:var(--mono);margin-top:4px}
 .login-body{padding:22px 20px;max-width:440px;margin:0 auto;width:100%;flex:1}
-.lcard{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:18px;padding:24px}
+.lcard{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(20px);border-radius:18px;padding:24px}
 .lcard-title{font-size:16px;font-weight:800;color:white;margin-bottom:3px}
 .lcard-sub{font-size:12px;color:rgba(255,255,255,.5);margin-bottom:20px}
 .role-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:99px;padding:5px 14px;font-size:12px;font-weight:700;color:white;margin-bottom:18px}
 .fg{margin-bottom:14px}
 .fg label{display:block;font-size:11px;font-weight:700;color:rgba(255,255,255,.65);margin-bottom:7px;letter-spacing:.3px;text-transform:uppercase}
 .fg label.dk{color:var(--g700)}
-.fg input,.fg select{width:100%;padding:12px 14px;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:var(--rsm);color:white;font-family:var(--font);font-size:14px;font-weight:600;transition:border-color .2s;appearance:none;-webkit-appearance:none}
+.fg input,.fg select{width:100%;padding:12px 14px;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:var(--rsm);color:white;font-family:var(--font);font-size:14px;font-weight:600;transition:border-color .2s;appearance:none}
 .fg input::placeholder{color:rgba(255,255,255,.28);font-weight:400}
 .fg input:focus,.fg select:focus{outline:none;border-color:rgba(255,255,255,.65)}
 .fg select option{background:#1E5128;color:white}
 .fg.lt input,.fg.lt select{background:var(--g50);border-color:var(--g200);color:var(--g900)}
 .fg.lt select option{background:white;color:var(--g900)}
-.btn{width:100%;padding:14px;border:none;border-radius:var(--rsm);font-family:var(--font);font-size:15px;font-weight:800;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px;-webkit-tap-highlight-color:transparent}
-.btn-v{background:var(--fmc-v);color:white}.btn-v:hover{filter:brightness(1.1)}
-.btn-v:active{transform:scale(.97)}
+.btn{width:100%;padding:14px;border:none;border-radius:var(--rsm);font-family:var(--font);font-size:15px;font-weight:800;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-v{background:var(--fmc-v);color:white}.btn-v:hover{filter:brightness(1.1);transform:translateY(-1px)}
 .btn-login{background:white;color:#1E5128;border-radius:12px;font-size:15px;font-weight:800;padding:15px}
 .btn-login:hover{background:var(--fmc-vl)}
 .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
 .icard{background:white;border-radius:var(--r);border:1px solid var(--g200);padding:16px 18px;box-shadow:var(--sh)}
 .icard .iv{font-size:28px;font-weight:800;color:var(--fmc-vd);letter-spacing:-1px}
 .icard .il{font-size:11.5px;color:var(--g500);margin-top:2px}
-/* TOKEN CARD - destaque total */
-.pcard{background:white;border-radius:var(--r);border:2px solid var(--fmc-v);box-shadow:0 4px 32px rgba(58,125,68,.2);padding:28px 24px;text-align:center;margin-bottom:16px}
+.pcard{background:white;border-radius:var(--r);border:1px solid var(--g200);box-shadow:var(--sh);padding:28px 24px;text-align:center;margin-bottom:16px}
 .pcard-title{font-size:12px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
 .pcard-sub{font-size:13px;color:var(--g400);margin-bottom:20px;line-height:1.5}
-.ptok{
-  font-family:var(--mono);font-size:64px;font-weight:600;
-  letter-spacing:14px;color:var(--fmc-vd);
-  margin:8px 0 20px;
-  text-shadow:0 2px 8px rgba(30,81,40,.15);
-  background:var(--g50);border-radius:14px;padding:16px 12px;
-  border:2px dashed rgba(58,125,68,.25);
-}
+.ptok{font-family:var(--mono);font-size:60px;font-weight:600;letter-spacing:12px;color:var(--fmc-vd);margin:8px 0 16px}
 .pbar-track{height:8px;background:var(--g100);border-radius:99px;overflow:hidden;margin-bottom:10px}
 .pbar-fill{height:100%;border-radius:99px;background:var(--fmc-v);transition:width 1s linear}
-.ptimer{font-size:14px;font-weight:700;color:var(--g500);margin-bottom:20px}
-.ptimer span{color:var(--fmc-vd);font-family:var(--mono);font-size:16px}
-.ptimer.exp{color:#EF4444}.ptimer.exp span{color:#EF4444}
+.ptimer{font-size:13px;font-weight:700;color:var(--g500);margin-bottom:20px}
+.ptimer span{color:var(--fmc-vd);font-family:var(--mono)}
 .arow{padding:14px 20px;border-bottom:1px solid var(--g100);display:flex;align-items:center;gap:12px}
 .arow:last-child{border-bottom:none}
 .anum{width:30px;height:30px;border-radius:8px;background:var(--fmc-v);color:white;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
@@ -94,7 +77,7 @@ body{font-family:var(--font);background:var(--g100);color:var(--g900);min-height
     <img class="banner-logo" src="1000281242.png" alt="FMC">
     <h1>Faculdade de Medicina de Campos</h1>
     <h2>Caderneta Digital de Estágio Hospitalar</h2>
-    <div class="fbpn">Fundação Benedito Pereira Nunes · Campos dos Goytacazes, RJ</div>
+    <div class="fbpn">Mantida pela Fundação Benedito Pereira Nunes · Campos dos Goytacazes, RJ</div>
     <div class="semestre">Semestre 2026.1 · Painel do Preceptor v1.0</div>
   </div>
   <div class="login-body">
@@ -119,7 +102,7 @@ body{font-family:var(--font);background:var(--g100);color:var(--g900);min-height
       </div>
       <button class="btn btn-login" onclick="fazerLogin()">Acessar Painel →</button>
       <div style="text-align:center;margin-top:16px">
-        <a href="index.html" style="color:rgba(255,255,255,.4);font-size:12px;text-decoration:none">← Voltar à tela inicial</a>
+        <a href="caderneta-aluno.html" style="color:rgba(255,255,255,.5);font-size:12px;text-decoration:none">Sou aluno → Caderneta do Aluno</a>
       </div>
     </div>
   </div>
@@ -134,30 +117,26 @@ body{font-family:var(--font);background:var(--g100);color:var(--g900);min-height
     <button class="tb-back" onclick="ir('screen-login')">Sair</button>
   </div>
   <div class="container">
-
     <div class="info-grid">
       <div class="icard"><div class="iv" id="info-alunos">0</div><div class="il">Alunos hoje</div></div>
       <div class="icard"><div class="iv" id="info-validos">0</div><div class="il">Presenças válidas</div></div>
     </div>
-
     <div class="pcard">
-      <div class="pcard-title">🔑 Token do Plantão</div>
-      <div class="pcard-sub">Mostre este código na tela ou fale em voz alta para os alunos digitarem</div>
+      <div class="pcard-title">Token do Plantão de Hoje</div>
+      <div class="pcard-sub">Compartilhe este código com os alunos presentes para que registrem a presença</div>
       <div class="ptok" id="tok-display">— — — —</div>
       <div class="pbar-track"><div class="pbar-fill" id="tok-bar" style="width:100%"></div></div>
-      <div class="ptimer" id="tok-timer-wrap">Expira em <span id="tok-timer">—</span></div>
+      <div class="ptimer">Expira em <span id="tok-timer">—</span></div>
       <button class="btn btn-v" onclick="gerarToken()">🔄 Gerar Novo Token</button>
     </div>
-
     <div class="card">
       <div class="card-head"><span>👨‍⚕️</span><h2>Alunos Registrados Hoje</h2></div>
       <div id="alunos-list"><div class="lbox"><p>Nenhum aluno registrado ainda.<br>Compartilhe o token para que registrem.</p></div></div>
     </div>
-
     <div class="card">
       <div class="card-head"><span>✏️</span><h2>Registrar Presença Manual</h2></div>
       <div class="card-body">
-        <div class="fg lt"><label class="dk">RA do Aluno</label><input type="text" id="m-ra" placeholder="Matrícula" inputmode="numeric"></div>
+        <div class="fg lt"><label class="dk">RA do Aluno</label><input type="text" id="m-ra" placeholder="Matrícula do aluno" inputmode="numeric"></div>
         <div class="fg lt"><label class="dk">Nome do Aluno</label><input type="text" id="m-nome" placeholder="Nome completo"></div>
         <div class="fg lt">
           <label class="dk">Período</label>
@@ -170,18 +149,19 @@ body{font-family:var(--font);background:var(--g100);color:var(--g900);min-height
         <button class="btn btn-v" onclick="registrarManual()">✅ Confirmar Presença</button>
       </div>
     </div>
-
   </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(()=>{});
-
 let preceptor={},alunosHoje=[],tokenAtual='',tokenExpira=0,timerInterval=null;
 
-function ir(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));document.getElementById(id).classList.add('on');window.scrollTo(0,0);}
+function ir(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  window.scrollTo(0,0);
+}
 
 function fazerLogin(){
   const crm=document.getElementById('login-crm').value.trim();
@@ -193,7 +173,8 @@ function fazerLogin(){
   preceptor={crm,nome,esp,hosp};
   document.getElementById('tb-nome').textContent=nome;
   document.getElementById('tb-sub').textContent=(esp?esp+' · ':'')+hosp;
-  gerarToken();ir('screen-painel');
+  gerarToken();
+  ir('screen-painel');
 }
 
 function gerarToken(){
@@ -209,26 +190,23 @@ function gerarToken(){
 
 function atualizarTimer(){
   const resto=tokenExpira-Date.now();
-  const tw=document.getElementById('tok-timer-wrap');
   if(resto<=0){
     clearInterval(timerInterval);
     document.getElementById('tok-timer').textContent='Expirado';
     document.getElementById('tok-bar').style.width='0%';
     document.getElementById('tok-display').textContent='— — — —';
-    tw.className='ptimer exp';
     tokenAtual='';return;
   }
   const seg=Math.floor(resto/1000),min=Math.floor(seg/60),s=seg%60;
   document.getElementById('tok-timer').textContent=min+':'+(s<10?'0':'')+s;
   document.getElementById('tok-bar').style.width=(resto/(10*60*1000)*100)+'%';
-  tw.className=resto<120000?'ptimer exp':'ptimer';
 }
 
 function registrarManual(){
   const ra=document.getElementById('m-ra').value.trim();
   const nome=document.getElementById('m-nome').value.trim();
   const periodo=document.getElementById('m-periodo').value;
-  if(!ra||!nome){toast('Preencha RA e nome','err');return;}
+  if(!ra||!nome){toast('Preencha RA e nome do aluno','err');return;}
   if(alunosHoje.find(a=>a.ra===ra)){toast('Aluno já registrado hoje','err');return;}
   alunosHoje.push({ra,nome,periodo,hora:new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}),metodo:'manual'});
   renderAlunos();
@@ -242,11 +220,21 @@ function renderAlunos(){
   document.getElementById('info-validos').textContent=alunosHoje.length;
   const list=document.getElementById('alunos-list');
   if(!alunosHoje.length){list.innerHTML='<div class="lbox"><p>Nenhum aluno registrado ainda.<br>Compartilhe o token para que registrem.</p></div>';return;}
-  list.innerHTML=alunosHoje.map((a,i)=>`<div class="arow"><div class="anum">${i+1}</div><div class="ainfo"><div class="anome">${a.nome} <span style="font-size:10.5px;color:#94A3B8;font-weight:400">RA ${a.ra}</span></div><div class="aperiodo">${a.periodo} · ${a.hora}${a.metodo==='manual'?' · Manual':''}</div></div><span class="badge-ok">✓ OK</span></div>`).join('');
+  list.innerHTML=alunosHoje.map((a,i)=>`
+    <div class="arow">
+      <div class="anum">${i+1}</div>
+      <div class="ainfo"><div class="anome">${a.nome} <span style="font-size:10.5px;color:#94A3B8;font-weight:400">RA ${a.ra}</span></div>
+      <div class="aperiodo">${a.periodo} · ${a.hora}${a.metodo==='manual'?' · Manual':''}</div></div>
+      <span class="badge-ok">✓ OK</span>
+    </div>`).join('');
 }
 
 let _tTO;
-function toast(msg,tipo='ok'){const el=document.getElementById('toast');el.textContent=msg;el.className='toast '+tipo+' show';clearTimeout(_tTO);_tTO=setTimeout(()=>el.classList.remove('show'),2800);}
+function toast(msg,tipo='ok'){
+  const el=document.getElementById('toast');
+  el.textContent=msg;el.className='toast '+tipo+' show';
+  clearTimeout(_tTO);_tTO=setTimeout(()=>el.classList.remove('show'),2800);
+}
 </script>
 </body>
 </html>
