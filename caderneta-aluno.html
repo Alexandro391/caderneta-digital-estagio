@@ -81,45 +81,87 @@ function similaridade(a,b){
   const u=bA.size+bB.size-i; return u?i/u:0;
 }
 
-// ── LOGIN ─────────────────────────────────────────────────────
+// ── LOGIN CORRIGIDO ─────────────────────────────────────────────────────
 async function fazerLogin(){
-  const ra   = document.getElementById('login-ra').value.trim();
-  const nome = document.getElementById('login-nome').value.trim();
-  if(!ra||!nome){ toast('Preencha RA e nome','err'); return; }
+  const raInput = document.getElementById('login-ra').value.trim();
+  const nomeDigitado = document.getElementById('login-nome').value.trim();
+  
+  if(!raInput || !nomeDigitado){ toast('Preencha RA e nome','err'); return; }
+  
   const btn = document.getElementById('btn-login');
-  btn.disabled = true; showLoading('Verificando cadastro...');
+  btn.disabled = true; 
+  showLoading('Verificando cadastro...');
+  
   try {
-    const q   = query(collection(db,'alunos'), where('ra','==',ra));
-    const snap = await getDocs(q);
-    if(snap.empty){ hideLoading(); btn.disabled=false; toast('RA não encontrado. Procure a secretaria.','err'); return; }
+    // Tenta buscar o RA como Texto e como Número (evita erro de tipo no banco)
+    const qTexto = query(collection(db,'alunos'), where('ra','==', raInput));
+    const qNum   = query(collection(db,'alunos'), where('ra','==', Number(raInput)));
+    
+    const [snapTexto, snapNum] = await Promise.all([getDocs(qTexto), getDocs(qNum)]);
+    const snap = !snapTexto.empty ? snapTexto : snapNum;
+
+    if(snap.empty){ 
+      hideLoading(); btn.disabled=false; 
+      toast('RA não encontrado. Procure a secretaria.','err'); 
+      return; 
+    }
+
     const dados = snap.docs[0].data();
-    if(similaridade(nome, dados.nome) < 0.55){
-      hideLoading(); btn.disabled=false; toast('Nome não corresponde ao RA. Verifique seus dados.','err'); return;
+    
+    // Diminuímos a exigência para 0.4 para ser mais justo com erros de acento/espaço
+    const grauSimilaridade = similaridade(nomeDigitado, dados.nome);
+    console.log("Similaridade:", grauSimilaridade);
+
+    if(grauSimilaridade < 0.4){
+      hideLoading(); btn.disabled=false; 
+      toast('Nome não confere com o RA cadastrado.','err'); 
+      return;
     }
-    if(dados.status && dados.status.toLowerCase() !== 'ativo'){
-      hideLoading(); btn.disabled=false; toast('Matrícula '+dados.status+'. Procure a secretaria.','err'); return;
+
+    // Validação de status flexível (aceita 'ativo' ou vazio)
+    if(dados.status && !['ativo', 'ativa'].includes(dados.status.toLowerCase().trim())){
+      hideLoading(); btn.disabled=false; 
+      toast('Matrícula ' + dados.status + '. Procure a secretaria.', 'err'); 
+      return;
     }
-    usuario = { ra: dados.ra, nome: dados.nome, periodo: dados.periodo, docId: snap.docs[0].id };
-    periodoSel = dados.periodo || periodoSel;
+
+    // SUCESSO NO LOGIN
+    usuario = { 
+      ra: dados.ra, 
+      nome: dados.nome, 
+      periodo: dados.periodo || "7º Período", 
+      docId: snap.docs[0].id 
+    };
+    
+    periodoSel = usuario.periodo;
     const c = cor();
     document.documentElement.style.setProperty('--p', c.p);
     document.documentElement.style.setProperty('--pl', c.l);
     document.documentElement.style.setProperty('--pg', c.g);
     document.querySelectorAll('.topbar').forEach(t=>t.style.background=c.p);
     document.querySelectorAll('.pbtn').forEach(b=>b.classList.toggle('sel', b.dataset.p===periodoSel));
-    document.getElementById('perfil-card').style.background = c.g;
+    
     document.getElementById('perfil-nome').textContent = usuario.nome;
-    document.getElementById('perfil-ra').textContent   = 'RA: '+usuario.ra;
+    document.getElementById('perfil-ra').textContent   = 'RA: ' + usuario.ra;
     document.getElementById('perfil-per').textContent  = usuario.periodo;
-    document.getElementById('tb-nome').textContent     = usuario.nome;
-    document.getElementById('tb-sub').textContent      = 'RA: '+usuario.ra;
-    // Conta plantões
-    const qp = query(collection(db,'plantoes'), where('ra','==',ra), where('status','==','Confirmado'));
-    const sp  = await getDocs(qp);
+    document.getElementById('tb-nome').textContent      = usuario.nome;
+    document.getElementById('tb-sub').textContent       = 'RA: ' + usuario.ra;
+
+    // Busca plantões para o Hero
+    const qp = query(collection(db,'plantoes'), where('ra','==', usuario.ra), where('status','==','Confirmado'));
+    const sp = await getDocs(qp);
     renderHero(sp.size);
-    hideLoading(); ir('screen-menu');
-    toast('Bem-vindo(a), '+usuario.nome.split(' ')[0]+'! 👋','ok');
-  } catch(e){ hideLoading(); btn.disabled=false; toast('Erro de conexão. Verifique sua internet.','err'); console.error(e); }
+
+    hideLoading(); 
+    ir('screen-menu');
+    toast('Bem-vindo(a), ' + usuario.nome.split(' ')[0] + '! 👋', 'ok');
+
+  } catch(e){ 
+    hideLoading(); 
+    btn.disabled=false; 
+    toast('Erro de conexão ou índice.', 'err'); 
+    console.error("Erro detalhado:", e); 
+  }
 }
 window.fazerLogin = fazerLogin;
 
