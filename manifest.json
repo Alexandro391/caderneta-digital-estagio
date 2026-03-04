@@ -2,7 +2,7 @@
   "name": "Caderneta FMC",
   "short_name": "Caderneta FMC",
   "description": "Caderneta Digital de Estágio Hospitalar - FMC",
-  "start_url": "./index.html",
+  "start_url": "index.html",
   "display": "standalone",
   "background_color": "#1E5128",
   "theme_color": "#1E5128",
