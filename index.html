@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1E5128">
+<link rel="manifest" href="manifest.json">
+<title>Caderneta FMC · Estágio Hospitalar</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--fmc-v:#3A7D44;--fmc-vd:#1E5128;--fmc-vl:#D6EDD9;--font:'Sora',sans-serif;--mono:'DM Mono',monospace}
+body{font-family:var(--font);min-height:100vh;background:linear-gradient(160deg,#0A1A0D 0%,#1E5128 50%,#0F2D18 100%);display:flex;flex-direction:column;position:relative;overflow:hidden}
+body::before{content:'';position:absolute;inset:0;opacity:.04;background:radial-gradient(circle at 25% 60%,white 1px,transparent 1px) 0 0/50px 50px}
+.wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 20px;position:relative;z-index:1}
+.logo-wrap{margin-bottom:28px;text-align:center}
+.logo-wrap svg{filter:drop-shadow(0 8px 24px rgba(0,0,0,.4))}
+h1{font-size:20px;font-weight:800;color:white;letter-spacing:-.4px;margin-bottom:4px;text-align:center}
+h2{font-size:13px;font-weight:400;color:rgba(255,255,255,.65);margin-bottom:6px;text-align:center}
+.fbpn{font-size:11px;color:rgba(255,255,255,.35);text-align:center;margin-bottom:6px}
+.semestre{font-size:10.5px;color:rgba(255,255,255,.25);font-family:var(--mono);text-align:center;margin-bottom:40px}
+.cards{display:flex;flex-direction:column;gap:14px;width:100%;max-width:380px}
+.rcard{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.15);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-radius:18px;padding:20px 22px;cursor:pointer;transition:all .22s;text-decoration:none;display:flex;align-items:center;gap:16px}
+.rcard:hover{background:rgba(255,255,255,.15);transform:translateY(-2px);box-shadow:0 12px 40px rgba(0,0,0,.3)}
+.rcard:active{transform:scale(.97)}
+.rcard-icon{font-size:32px;flex-shrink:0;width:52px;height:52px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.1);border-radius:14px;border:1px solid rgba(255,255,255,.15)}
+.rcard-text{}
+.rcard-title{font-size:15px;font-weight:800;color:white;margin-bottom:3px}
+.rcard-sub{font-size:12px;color:rgba(255,255,255,.5)}
+.rcard-arrow{margin-left:auto;font-size:18px;color:rgba(255,255,255,.35);flex-shrink:0}
+.coord-btn{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08)}
+footer{text-align:center;padding:20px;font-size:11px;color:rgba(255,255,255,.2);position:relative;z-index:1}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo-wrap">
+    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" width="100" height="100">
+      <circle cx="100" cy="100" r="100" fill="#3A7D44"/>
+      <circle cx="38" cy="118" r="9" fill="white"/>
+      <path d="M56 82 Q56 62 76 62 L86 62 L86 74 L78 74 Q70 74 70 82 L70 92 L84 92 L84 104 L70 104 L70 140 L56 140 Z" fill="white"/>
+      <path d="M90 92 L104 92 L104 102 Q108 92 118 92 Q128 92 130 102 Q134 92 144 92 L158 92 L158 140 L144 140 L144 108 Q144 102 138 102 Q132 102 132 108 L132 140 L118 140 L118 108 Q118 102 112 102 Q106 102 106 108 L106 140 L90 140 Z" fill="white"/>
+      <path d="M175 108 Q168 100 156 100 Q144 100 140 108 Q136 116 140 124 Q144 132 156 132 Q168 132 175 124" stroke="white" stroke-width="13" fill="none" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <h1>Caderneta Digital de Estágio</h1>
+  <h2>Faculdade de Medicina de Campos</h2>
+  <div class="fbpn">Fundação Benedito Pereira Nunes · Campos dos Goytacazes, RJ</div>
+  <div class="semestre">Semestre 2026.1 · Firebase v2.0</div>
+  <div class="cards">
+    <a href="caderneta-aluno.html" class="rcard">
+      <div class="rcard-icon">👨‍⚕️</div>
+      <div class="rcard-text"><div class="rcard-title">Sou Aluno</div><div class="rcard-sub">Registrar plantões e ver histórico</div></div>
+      <div class="rcard-arrow">›</div>
+    </a>
+    <a href="caderneta-preceptor.html" class="rcard">
+      <div class="rcard-icon">🩺</div>
+      <div class="rcard-text"><div class="rcard-title">Sou Preceptor</div><div class="rcard-sub">Gerar tokens e acompanhar presenças</div></div>
+      <div class="rcard-arrow">›</div>
+    </a>
+    <a href="coordenacao.html" class="rcard coord-btn">
+      <div class="rcard-icon">📊</div>
+      <div class="rcard-text"><div class="rcard-title">Coordenação</div><div class="rcard-sub">Dashboard e relatórios · acesso restrito</div></div>
+      <div class="rcard-arrow">›</div>
+    </a>
+  </div>
+</div>
+<footer>Caderneta Digital FMC · 2026 · Powered by Firebase</footer>
+</body>
+</html>
