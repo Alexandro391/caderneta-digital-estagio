@@ -28,103 +28,114 @@ const ESPECIALIDADES = {
 :root{
   --p:#1D4ED8;--pl:#DBEAFE;--pg:linear-gradient(135deg,#1D4ED8,#3B82F6);
   --fmc-v:#3A7D44;--fmc-vd:#1E5128;--fmc-vl:#D6EDD9;
-  --g100:#F1F5F9;--g200:#E2E8F0;--g400:#94A3B8;--g700:#334155;--g900:#0F172A;
-  --font:'Sora',sans-serif;--r:16px;--sh:0 4px 24px rgba(0,0,0,.09);
+  --g50:#F8FAFC;--g100:#F1F5F9;--g200:#E2E8F0;--g400:#94A3B8;
+  --g500:#64748B;--g700:#334155;--g900:#0F172A;
+  --font:'Sora',sans-serif;--r:16px;--rsm:10px;--sh:0 4px 24px rgba(0,0,0,.09);
 }
-*{box-sizing:border-box;margin:0;padding:0}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:var(--font);background:var(--g100);color:var(--g900);min-height:100vh}
 .screen{display:none}.screen.on{display:block;animation:up .3s ease}
 @keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
-/* UI ELEMENTS */
-.topbar{color:white;padding:0 18px;height:58px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:50;box-shadow:0 2px 16px rgba(0,0,0,.22)}
-.tb-title{font-size:14px;font-weight:700}
-.tb-sub{font-size:10px;opacity:0.7}
-.tb-back{margin-left:auto;background:rgba(255,255,255,.15);border:none;color:white;border-radius:99px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer}
+/* TOPBAR */
+.topbar{color:white;padding:0 18px;height:58px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:50;box-shadow:0 2px 16px rgba(0,0,0,.22);transition:background .45s}
+.tb-title{font-size:14px;font-weight:700;letter-spacing:-.3px}
+.tb-sub{font-size:10.5px;color:rgba(255,255,255,.55)}
+.tb-back{margin-left:auto;background:rgba(255,255,255,.15);border:none;color:white;border-radius:99px;padding:6px 14px;font-family:var(--font);font-size:12px;font-weight:700;cursor:pointer}
 
-.container{max-width:480px;margin:0 auto;padding:20px 16px}
-.card{background:white;border-radius:var(--r);border:1px solid var(--g200);box-shadow:var(--sh);margin-bottom:16px;overflow:hidden}
-.card-head{padding:15px 20px;border-bottom:1px solid var(--g100);display:flex;align-items:center;gap:8px}
+.container{max-width:480px;margin:0 auto;padding:20px 16px 64px}
+.card{background:white;border-radius:var(--r);border:1px solid var(--g200);box-shadow:var(--sh);overflow:hidden;margin-bottom:16px}
+.card-head{padding:15px 20px;border-bottom:1px solid var(--g100);display:flex;align-items:center;gap:9px}
+.card-head h2{font-size:14px;font-weight:700;color:var(--g900)}
 .card-body{padding:20px}
 
-/* LOGIN SCREEN */
-.login-wrap{min-height:100vh;background:linear-gradient(160deg,#1E5128 0%,#3A7D44 100%);padding:40px 20px}
-.banner{text-align:center;color:white;margin-bottom:30px}
-.banner h1{font-size:20px;margin-bottom:5px}
-.banner p{font-size:12px;opacity:0.7}
-.lcard{background:rgba(255,255,255,0.1);backdrop-filter:blur(10px);padding:25px;border-radius:20px;border:1px solid rgba(255,255,255,0.2)}
-.fg{margin-bottom:15px}
-.fg label{display:block;font-size:11px;font-weight:700;margin-bottom:5px;text-transform:uppercase;color:rgba(255,255,255,0.7)}
+/* LOGIN */
+.login-wrap{min-height:100vh;display:flex;flex-direction:column;background:linear-gradient(160deg,#1E5128 0%,#3A7D44 55%,#166534 100%);position:relative;overflow:hidden}
+.banner{background:rgba(0,0,0,.2);padding:28px 24px 22px;text-align:center;border-bottom:1px solid rgba(255,255,255,.1)}
+.banner h1{font-size:18px;font-weight:800;color:white;letter-spacing:-.4px;margin-bottom:3px}
+.banner h2{font-size:12px;font-weight:400;color:rgba(255,255,255,.7);margin-bottom:4px}
+
+.login-body{padding:20px;max-width:440px;margin:0 auto;width:100%;flex:1}
+.lcard{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(20px);border-radius:18px;padding:22px}
+.lcard-title{font-size:15px;font-weight:800;color:white;margin-bottom:2px}
+.lcard-sub{font-size:12px;color:rgba(255,255,255,.5);margin-bottom:18px}
+
+/* PERÍODO */
+.periodo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px}
+.pbtn{padding:10px 4px;border-radius:11px;border:2px solid transparent;background:rgba(255,255,255,.08);color:rgba(255,255,255,.65);font-size:10px;font-weight:700;cursor:pointer;text-align:center;transition:all .2s}
+.pbtn.sel{border-color:white;color:white;background:rgba(255,255,255,0.2)}
+.pbtn .pe{font-size:18px;display:block;margin-bottom:2px}
+
+/* FORM */
+.fg{margin-bottom:12px}
+.fg label{display:block;font-size:11px;font-weight:700;color:rgba(255,255,255,.65);margin-bottom:6px;text-transform:uppercase}
 .fg.lt label{color:var(--g700)}
-.fg input, .fg select{width:100%;padding:12px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:white;font-family:var(--font)}
-.fg.lt input, .fg.lt select{background:var(--g100);color:var(--g900);border-color:var(--g200)}
-.periodo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:20px}
-.pbtn{padding:10px;border-radius:10px;border:2px solid transparent;background:rgba(255,255,255,0.1);color:white;cursor:pointer;font-size:10px;font-weight:700}
-.pbtn.sel{border-color:white;background:rgba(255,255,255,0.3)}
+.fg input,.fg select{width:100%;padding:11px 13px;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:var(--rsm);color:white;font-family:var(--font);font-size:14px}
+.fg.lt input,.fg.lt select{background:var(--g50);border-color:var(--g200);color:var(--g900)}
+.fg select option{background:#1E5128;color:white}
+.fg.lt select option{background:white;color:var(--g900)}
 
-/* PROGRESS HERO */
-.hero{border-radius:var(--r);padding:20px;color:white;margin-bottom:16px;position:relative}
-.hero-num{font-size:40px;font-weight:800}
-.prog-track{height:8px;background:rgba(255,255,255,0.2);border-radius:10px;margin:10px 0}
-.prog-fill{height:100%;background:white;border-radius:10px;transition:width 1s}
-
-/* BUTTONS */
-.btn{width:100%;padding:15px;border-radius:12px;border:none;font-weight:800;cursor:pointer;font-family:var(--font)}
-.btn-login{background:white;color:var(--fmc-vd)}
+/* BOTÕES */
+.btn{width:100%;padding:13px;border:none;border-radius:var(--rsm);font-family:var(--font);font-size:15px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
 .btn-p{background:var(--p);color:white}
-.btn:disabled{opacity:0.5;cursor:not-allowed}
+.btn-login{background:white;color:#1E5128}
+
+/* HERO PROGRES */
+.hero{border-radius:var(--r);padding:20px;color:white;margin-bottom:16px;position:relative;overflow:hidden}
+.hero::after{content:'🏥';position:absolute;right:14px;bottom:-8px;font-size:80px;opacity:.07;pointer-events:none}
+.hero-num{font-size:48px;font-weight:800;letter-spacing:-3px;line-height:1}
+.hero-num span{font-size:18px;font-weight:400;color:rgba(255,255,255,.4)}
+.prog-track{height:7px;background:rgba(255,255,255,.2);border-radius:99px;margin:12px 0}
+.prog-fill{height:100%;border-radius:99px;background:rgba(255,255,255,.9);transition:width 1s}
 
 /* HISTÓRICO */
 .hrow{padding:12px 16px;border-bottom:1px solid var(--g100);display:flex;align-items:center;gap:12px}
 .hinfo{flex:1}
-.hdata{font-size:13px;font-weight:700}
-.hlocal{font-size:11px;color:var(--g400)}
+.hdata{font-size:13px;font-weight:700;color:var(--g900)}
+.hlocal{font-size:11px;color:var(--g500)}
 
-.loading-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:none;align-items:center;justify-content:center;color:white;z-index:100}
+.loading-overlay{position:fixed;inset:0;background:rgba(15,23,42,.7);z-index:300;display:none;align-items:center;justify-content:center;color:white}
 .loading-overlay.on{display:flex}
 </style>
 </head>
 <body>
 
-<div class="loading-overlay" id="loading">Carregando...</div>
+<div class="loading-overlay" id="loading">Aguarde...</div>
 
 <div id="screen-login" class="screen on">
-  <div class="login-wrap">
-    <div class="banner">
-      <h1>FMC</h1>
-      <p>Caderneta Digital de Estágio</p>
-    </div>
+<div class="login-wrap">
+  <div class="banner">
+    <h1>FMC</h1>
+    <h2>Caderneta Digital de Estágio</h2>
+  </div>
+  <div class="login-body">
     <div class="lcard">
-      <div class="fg">
-        <label>Matrícula (RA)</label>
-        <input type="number" id="login-ra" placeholder="Digite seu RA">
-      </div>
-      <div class="fg">
-        <label>Nome Completo</label>
-        <input type="text" id="login-nome" placeholder="Seu nome">
-      </div>
-      <label style="font-size:11px; color:white; margin-bottom:10px; display:block">PERÍODO</label>
+      <div class="lcard-title">Entrar como Aluno</div>
+      <div class="lcard-sub">Preencha seus dados para acessar</div>
+      <div class="fg"><label>Matrícula (RA)</label><input type="number" id="login-ra" placeholder="Ex: 2022001"></div>
+      <div class="fg"><label>Nome Completo</label><input type="text" id="login-nome" placeholder="Seu nome completo"></div>
       <div class="periodo-grid">
-        <button class="pbtn sel" data-p="5º Período" onclick="selPeriodo(this)">5º</button>
-        <button class="pbtn" data-p="6º Período" onclick="selPeriodo(this)">6º</button>
-        <button class="pbtn" data-p="7º Período" onclick="selPeriodo(this)">7º</button>
-        <button class="pbtn" data-p="8º Período" onclick="selPeriodo(this)">8º</button>
+        <button class="pbtn sel" data-p="5º Período" onclick="selPeriodo(this)"><span class="pe">🔵</span>5º Per.</button>
+        <button class="pbtn" data-p="6º Período" onclick="selPeriodo(this)"><span class="pe">🩵</span>6º Per.</button>
+        <button class="pbtn" data-p="7º Período" onclick="selPeriodo(this)"><span class="pe">🟢</span>7º Per.</button>
+        <button class="pbtn" data-p="8º Período" onclick="selPeriodo(this)"><span class="pe">💚</span>8º Per.</button>
       </div>
-      <button class="btn btn-login" onclick="fazerLogin()">ACESSAR CADERNETA</button>
+      <button class="btn btn-login" onclick="fazerLogin()">Entrar na Caderneta →</button>
     </div>
   </div>
+</div>
 </div>
 
 <div id="screen-menu" class="screen">
   <div class="topbar" id="tb-menu">
-    <div><div class="tb-title" id="tb-nome">—</div><div class="tb-sub" id="tb-sub">—</div></div>
+    <div style="flex:1"><div class="tb-title" id="tb-nome">—</div><div class="tb-sub" id="tb-sub">—</div></div>
     <button class="tb-back" onclick="sair()">Sair</button>
   </div>
   <div class="container">
     <div id="hero-area"></div>
-    <button class="btn btn-p" onclick="irReg()" style="margin-bottom:12px">+ REGISTRAR PLANTÃO</button>
+    <button class="btn btn-p" onclick="irReg()" style="margin-bottom:16px">+ REGISTRAR PRESENÇA</button>
     <div class="card">
-      <div class="card-head"><b>Histórico Recente</b></div>
+      <div class="card-head"><h2>Histórico de Atividades</h2></div>
       <div id="lista-hist"></div>
     </div>
   </div>
@@ -132,15 +143,15 @@ body{font-family:var(--font);background:var(--g100);color:var(--g900);min-height
 
 <div id="screen-reg" class="screen">
   <div class="topbar" id="tb-reg">
-    <div class="tb-title">Novo Registro</div>
-    <button class="tb-back" onclick="ir('screen-menu')">Voltar</button>
+    <div class="tb-title">Registrar Atividade</div>
+    <button class="tb-back" onclick="ir('screen-menu')">← Voltar</button>
   </div>
   <div class="container">
     <div class="card">
       <div class="card-body">
         <div class="fg lt"><label>Hospital</label>
           <select id="r-hosp">
-            <option value="">Selecionar...</option>
+            <option value="">Selecionar hospital...</option>
             <option>Hospital Ferreira Machado</option>
             <option>Hospital de Guarus</option>
             <option>Santa Casa</option>
@@ -148,9 +159,9 @@ body{font-family:var(--font);background:var(--g100);color:var(--g900);min-height
           </select>
         </div>
         <div class="fg lt"><label>Especialidade</label><select id="r-setor"></select></div>
-        <div class="fg lt"><label>Preceptor</label><input type="text" id="r-prec" placeholder="Nome do Médico"></div>
-        <div class="fg lt"><label>Token do Dia</label><input type="password" id="r-token" style="text-align:center; font-size:20px" placeholder="••••"></div>
-        <button class="btn btn-p" id="btn-salvar" onclick="salvarPlantao()">CONFIRMAR PRESENÇA</button>
+        <div class="fg lt"><label>Preceptor Responsável</label><input type="text" id="r-prec" placeholder="Nome do Médico"></div>
+        <div class="fg lt"><label>Token de Validação</label><input type="password" id="r-token" placeholder="Senha do Dia" style="text-align:center; letter-spacing:5px"></div>
+        <button class="btn btn-p" id="btn-salvar" onclick="salvar()">CONFIRMAR PRESENÇA</button>
       </div>
     </div>
   </div>
@@ -160,7 +171,14 @@ body{font-family:var(--font);background:var(--g100);color:var(--g900);min-height
 let USER = JSON.parse(localStorage.getItem('fmc_user')) || null;
 let PERIODO_SEL = "5º Período";
 
-window.onload = () => { if(USER) { loginSucesso(); } };
+window.onload = () => {
+  const params = new URLSearchParams(window.location.search);
+  if(params.get('nome')) {
+    USER = { nome: params.get('nome'), ra: params.get('ra'), periodo: params.get('periodo') + "º Período" };
+    localStorage.setItem('fmc_user', JSON.stringify(USER));
+  }
+  if(USER) loginSucesso();
+};
 
 function ir(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
@@ -176,7 +194,7 @@ function selPeriodo(btn) {
 function fazerLogin() {
   const ra = document.getElementById('login-ra').value;
   const nome = document.getElementById('login-nome').value;
-  if(!ra || !nome) return alert("Preencha tudo!");
+  if(!ra || !nome) return alert("Preencha todos os campos!");
   USER = { ra, nome, periodo: PERIODO_SEL };
   localStorage.setItem('fmc_user', JSON.stringify(USER));
   loginSucesso();
@@ -184,7 +202,7 @@ function fazerLogin() {
 
 function loginSucesso() {
   document.getElementById('tb-nome').innerText = USER.nome;
-  document.getElementById('tb-sub').innerText = `RA: ${USER.ra} • ${USER.periodo}`;
+  document.getElementById('tb-sub').innerText = `${USER.ra} • ${USER.periodo}`;
   document.getElementById('tb-menu').style.background = COR[USER.periodo].p;
   carregarDados();
   ir('screen-menu');
@@ -197,7 +215,7 @@ async function carregarDados() {
     const lista = data.registros || [];
     renderizarProgresso(lista.length);
     renderizarLista(lista);
-  } catch(e) { console.log("Erro ao carregar"); }
+  } catch(e) { console.error(e); }
 }
 
 function renderizarProgresso(qtd) {
@@ -205,19 +223,19 @@ function renderizarProgresso(qtd) {
   const cor = COR[USER.periodo];
   document.getElementById('hero-area').innerHTML = `
     <div class="hero" style="background:${cor.g}">
-      <div class="hero-num">${qtd}/${TOTAL_PLANTOES}</div>
-      <div style="font-size:12px; opacity:0.8">Plantões registrados</div>
+      <div class="hero-num">${qtd}<span>/${TOTAL_PLANTOES}</span></div>
+      <div style="font-size:11px; opacity:0.7">PLANTÕES CONCLUÍDOS</div>
       <div class="prog-track"><div class="prog-fill" style="width:${pct}%"></div></div>
     </div>`;
 }
 
 function renderizarLista(lista) {
   const cont = document.getElementById('lista-hist');
-  if(lista.length === 0) return cont.innerHTML = '<p style="padding:20px; text-align:center; font-size:12px; color:#999">Nenhum registro.</p>';
+  if(lista.length === 0) return cont.innerHTML = '<p style="padding:30px; text-align:center; color:#999">Nenhum registro encontrado.</p>';
   cont.innerHTML = lista.map(r => `
     <div class="hrow">
-      <div class="hinfo"><div class="hdata">${r.data}</div><div class="hlocal">${r.hospital}</div></div>
-      <div style="font-size:10px; font-weight:bold; color:green">CONFIRMADO</div>
+      <div class="hinfo"><div class="hdata">${r.data}</div><div class="hlocal">${r.hospital} • ${r.professor}</div></div>
+      <div style="font-size:10px; font-weight:bold; color:#059669">✓ OK</div>
     </div>`).join('');
 }
 
@@ -229,7 +247,7 @@ function irReg() {
   ir('screen-reg');
 }
 
-async function salvarPlantao() {
+async function salvar() {
   const btn = document.getElementById('btn-salvar');
   const dados = {
     nome: USER.nome, matricula: USER.ra, periodo: USER.periodo,
@@ -241,22 +259,20 @@ async function salvarPlantao() {
   };
 
   if(!dados.hospital || !dados.professor || !dados.tokenProfessor) return alert("Preencha tudo!");
-
-  btn.disabled = true;
-  btn.innerText = "PROCESSANDO...";
-  document.getElementById('loading').classList.add('on');
+  
+  btn.disabled = true; document.getElementById('loading').classList.add('on');
 
   try {
-    await fetch(APPS_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(dados) });
-    alert("Presença Registrada!");
-    location.reload(); 
+    const resp = await fetch(APPS_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(dados) });
+    alert("Registro enviado com sucesso!");
+    location.reload();
   } catch(e) {
-    alert("Erro ao salvar.");
-    btn.disabled = false;
+    alert("Erro na conexão.");
+    btn.disabled = false; document.getElementById('loading').classList.remove('on');
   }
 }
 
-function sair() { if(confirm("Sair da conta?")) { localStorage.clear(); location.reload(); } }
+function sair() { if(confirm("Deseja sair?")) { localStorage.clear(); location.href = "index.html"; } }
 </script>
 </body>
 </html>
