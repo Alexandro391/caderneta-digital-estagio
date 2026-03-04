@@ -68,5 +68,16 @@ footer{text-align:center;padding:20px;font-size:11px;color:rgba(255,255,255,.2);
   </div>
 </div>
 <footer>Caderneta Digital FMC · 2026 · Powered by Firebase</footer>
+
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(reg => console.log('Service Worker registrado!', reg))
+        .catch(err => console.log('Erro ao registrar Service Worker', err));
+    });
+  }
+</script>
+
 </body>
 </html>
