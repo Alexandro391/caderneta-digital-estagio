@@ -3,267 +3,70 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#1E5128">
 <link rel="manifest" href="manifest.json">
-<title>Caderneta FMC · Aluno</title>
+<title>Caderneta FMC · Estágio Hospitalar</title>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, query, where, getDocs, addDoc, doc, getDoc, Timestamp, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-const FB = { 
-    apiKey: "AIzaSyCTpK-m1xjzs27MJ0827GRpBrUaih_4wSg", 
-    authDomain: "caderneta-fmc.firebaseapp.com",
-    projectId: "caderneta-fmc", 
-    storageBucket: "caderneta-fmc.firebasestorage.app",
-    messagingSenderId: "739844114033", 
-    appId: "1:739844114033:web:bcc7234c924d0b13217dd0" 
-};
-const app = initializeApp(FB);
-const db  = getFirestore(app);
-
-// ── ESTADO ────────────────────────────────────────────────────
-let usuario = {}, periodoSel = "7º Período", fotoDataURL = null;
-
-const COR = {
-  "5º Período":  { p:"#1D4ED8", l:"#DBEAFE", g:"linear-gradient(135deg,#1D4ED8,#3B82F6)" },
-  "6º Período":  { p:"#0891B2", l:"#CFFAFE", g:"linear-gradient(135deg,#0891B2,#22D3EE)" },
-  "7º Período":  { p:"#059669", l:"#D1FAE5", g:"linear-gradient(135deg,#059669,#34D399)" },
-  "8º Período":  { p:"#166534", l:"#DCFCE7", g:"linear-gradient(135deg,#166534,#16A34A)" },
-  "9º Período":  { p:"#7C3AED", l:"#EDE9FE", g:"linear-gradient(135deg,#7C3AED,#A78BFA)" },
-  "10º Período": { p:"#C2410C", l:"#FFEDD5", g:"linear-gradient(135deg,#C2410C,#F97316)" },
-  "11º Período": { p:"#B45309", l:"#FEF3C7", g:"linear-gradient(135deg,#B45309,#F59E0B)" },
-  "12º Período": { p:"#9F1239", l:"#FFE4E6", g:"linear-gradient(135deg,#9F1239,#E11D48)" },
-};
-
-const HOSPITAIS = ["Hospital de Guarus","Hospital Ferreira Machado","Santa Casa de Misericórdia","Hospital Plantadores de Cana","Hospital São José","UBS Farol","Beneficência Portuguesa","Hospital Álvaro Alvim","UPA 24 Horas"];
-const ESPECIALIDADES = {
-  "5º Período": ["Clínica Médica I"], "6º Período": ["Clínica Médica II"],
-  "7º Período": ["Pediatria I","Clínica Cirúrgica","Obstetrícia","Ginecologia","Medicina Intensiva","DIP"],
-  "8º Período": ["Pediatria II","Clínica Cirúrgica II","Urologia","Oftalmologia","Otorrinolaringologia","Dermatologia","Ortopedia e Traumatologia"],
-  "9º Período": ["Clínica Médica","Cirurgia","Ginecologia e Obstetrícia","Pediatria","Saúde Mental"],
-  "10º Período": ["Internato Clínica Médica","Internato Cirurgia"],
-  "11º Período": ["Internato Ginecologia e Obstetrícia","Internato Pediatria"],
-  "12º Período": ["Internato Medicina de Família","Internato Urgência e Emergência"]
-};
-
-// ── UTILITÁRIOS ───────────────────────────────────────────────
-function cor(p){ return COR[p || periodoSel] || COR["7º Período"]; }
-function ir(id){ document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on')); document.getElementById(id).classList.add('on'); window.scrollTo(0,0); }
-function showLoading(msg){ document.getElementById('loading').classList.add('on'); document.getElementById('loading-msg').textContent = msg||'Aguarde...'; }
-function hideLoading(){ document.getElementById('loading').classList.remove('on'); }
-function norm(s){ return (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/\s+/g,' ').trim(); }
-
-function similaridade(a,b){
-  a=norm(a); b=norm(b);
-  if(a===b) return 1;
-  const bi=s=>{const r=new Set(); for(let i=0;i<s.length-1;i++) r.add(s.slice(i,i+2)); return r;};
-  const bA=bi(a),bB=bi(b); let i=0; bA.forEach(x=>{if(bB.has(x))i++;});
-  const u=bA.size+bB.size-i; return u?i/u:0;
-}
-
-// ── FUNÇÃO DE LOGIN (VERSÃO CORRIGIDA) ────────────────────────
-async function fazerLogin(){
-  const raInput = document.getElementById('login-ra').value.trim();
-  const nomeDigitado = document.getElementById('login-nome').value.trim();
-  
-  if(!raInput || !nomeDigitado){ toast('Preencha RA e nome','err'); return; }
-  
-  const btn = document.getElementById('btn-login');
-  btn.disabled = true; 
-  showLoading('Autenticando...');
-  
-  try {
-    const colRef = collection(db, 'alunos');
-    
-    // Busca RA como Texto e como Número
-    const qTexto = query(colRef, where('ra', '==', raInput));
-    const qNum = query(colRef, where('ra', '==', Number(raInput)));
-    
-    const [snapT, snapN] = await Promise.all([getDocs(qTexto), getDocs(qNum)]);
-    const snap = !snapT.empty ? snapT : snapN;
-
-    if (snap.empty) {
-      hideLoading(); btn.disabled = false;
-      toast('RA não encontrado no sistema.', 'err');
-      return;
-    }
-
-    const dados = snap.docs[0].data();
-    
-    // Comparação de nome flexível
-    const grau = similaridade(nomeDigitado, dados.nome);
-    const primNomeDig = nomeDigitado.split(' ')[0].toLowerCase();
-    const primNomeBanco = dados.nome.split(' ')[0].toLowerCase();
-
-    if(grau < 0.3 && primNomeDig !== primNomeBanco) {
-      hideLoading(); btn.disabled = false;
-      toast('Nome não confere com o RA.', 'err');
-      return;
-    }
-
-    // Login com Sucesso
-    usuario = { ra: dados.ra, nome: dados.nome, periodo: dados.periodo || periodoSel, docId: snap.docs[0].id };
-    periodoSel = usuario.periodo;
-    
-    // Ajuste de interface
-    const c = cor();
-    document.documentElement.style.setProperty('--p', c.p);
-    document.documentElement.style.setProperty('--pl', c.l);
-    document.documentElement.style.setProperty('--pg', c.g);
-    
-    document.getElementById('perfil-nome').textContent = usuario.nome;
-    document.getElementById('perfil-ra').textContent = 'RA: ' + usuario.ra;
-    document.getElementById('perfil-per').textContent = usuario.periodo;
-    document.getElementById('tb-nome').textContent = usuario.nome;
-    document.getElementById('tb-sub').textContent = 'RA: ' + usuario.ra;
-
-    // Busca plantões para o Hero
-    const qp = query(collection(db,'plantoes'), where('ra','==', usuario.ra), where('status','==','Confirmado'));
-    const sp = await getDocs(qp);
-    renderHero(sp.size);
-
-    hideLoading(); 
-    ir('screen-menu');
-    toast('Bem-vindo(a)! 👋', 'ok');
-
-  } catch (e) {
-    hideLoading(); btn.disabled = false;
-    console.error(e);
-    toast('Erro de conexão.', 'err');
-  }
-}
-
-// ── OUTRAS FUNÇÕES ───────────────────────────────────────────
-function renderHero(feito){
-  const TOTAL = 20;
-  const pct = Math.round(feito/TOTAL*100);
-  const c = cor();
-  let dots = '';
-  for(let i=1;i<=TOTAL;i++) dots += i<=feito?'<div class="dot done">✓</div>':'<div class="dot">'+i+'</div>';
-  document.getElementById('hero-prog').innerHTML = `
-    <div class="hero" style="background:${c.g}">
-      <div class="hero-top">
-        <div><div class="hero-num">${feito}<span>/${TOTAL}</span></div><div class="hero-lbl">Plantões</div></div>
-        <div><div class="hero-pct">${pct}%</div></div>
-      </div>
-      <div class="prog-track"><div class="prog-fill" style="width:${pct}%"></div></div>
-      <div class="dots-wrap">${dots}</div>
-    </div>`;
-}
-
-function toast(msg, tipo='ok'){
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className = `toast ${tipo} show`;
-  setTimeout(() => el.classList.remove('show'), 3000);
-}
-
-// Inicialização
-window.fazerLogin = fazerLogin;
-window.selecionarPeriodo = (p) => {
-  periodoSel = p;
-  document.querySelectorAll('.pbtn').forEach(b => b.classList.toggle('sel', b.dataset.p === p));
-  const c = cor();
-  document.documentElement.style.setProperty('--p', c.p);
-};
-
-// Funções de navegação simples
-window.irReg = () => {
-    document.getElementById('r-hosp').innerHTML = '<option value="">Selecionar...</option>' + HOSPITAIS.map(h=>`<option>${h}</option>`).join('');
-    ir('screen-reg');
-};
-window.irHist = () => ir('screen-hist');
-window.voltarMenu = () => ir('screen-menu');
-
-</script>
-
 <style>
-:root{--p:#059669;--pl:#D1FAE5;--pg:linear-gradient(135deg,#059669,#34D399);--g100:#F1F5F9;--g200:#E2E8F0;--g900:#0F172A;--font:'Sora',sans-serif;}
-body{font-family:var(--font);background:var(--g100);margin:0;}
-.screen{display:none; padding:20px; max-width:480px; margin:0 auto;}
-.screen.on{display:block;}
-.card{background:white; border-radius:16px; padding:20px; box-shadow:0 4px 12px rgba(0,0,0,0.05); margin-bottom:16px;}
-input, select{width:100%; padding:12px; margin:8px 0; border:1px solid var(--g200); border-radius:8px; box-sizing:border-box;}
-.btn{width:100%; padding:14px; border:none; border-radius:12px; background:var(--p); color:white; font-weight:bold; cursor:pointer;}
-.pbtn{display:inline-block; padding:8px 12px; background:#ddd; margin:4px; border-radius:8px; cursor:pointer; font-size:12px;}
-.pbtn.sel{background:var(--p); color:white;}
-.toast{position:fixed; bottom:20px; left:50%; transform:translateX(-50%); padding:12px 20px; border-radius:20px; color:white; display:none;}
-.toast.show{display:block;}
-.toast.ok{background:#059669;}
-.toast.err{background:#dc2626;}
-.loading-overlay{position:fixed; inset:0; background:rgba(0,0,0,0.5); display:none; align-items:center; justify-content:center; color:white; z-index:99;}
-.loading-overlay.on{display:flex;}
-.dot{width:20px; height:20px; display:inline-flex; align-items:center; justify-content:center; background:rgba(255,255,255,0.2); margin:2px; font-size:10px; border-radius:4px;}
-.dot.done{background:white; color:var(--p);}
-.hero{padding:20px; border-radius:16px; color:white;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--fmc-v:#3A7D44;--fmc-vd:#1E5128;--fmc-vl:#D6EDD9;--font:'Sora',sans-serif;--mono:'DM Mono',monospace}
+body{font-family:var(--font);min-height:100vh;background:linear-gradient(160deg,#0A1A0D 0%,#1E5128 50%,#0F2D18 100%);display:flex;flex-direction:column;position:relative;overflow:hidden}
+body::before{content:'';position:absolute;inset:0;opacity:.04;background:radial-gradient(circle at 25% 60%,white 1px,transparent 1px) 0 0/50px 50px}
+.wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 20px;position:relative;z-index:1}
+.logo-wrap{margin-bottom:28px;text-align:center}
+.logo-wrap svg{filter:drop-shadow(0 8px 24px rgba(0,0,0,.4))}
+h1{font-size:20px;font-weight:800;color:white;letter-spacing:-.4px;margin-bottom:4px;text-align:center}
+h2{font-size:13px;font-weight:400;color:rgba(255,255,255,.65);margin-bottom:6px;text-align:center}
+.fbpn{font-size:11px;color:rgba(255,255,255,.35);text-align:center;margin-bottom:6px}
+.semestre{font-size:10.5px;color:rgba(255,255,255,.25);font-family:var(--mono);text-align:center;margin-bottom:40px}
+.cards{display:flex;flex-direction:column;gap:14px;width:100%;max-width:380px}
+.rcard{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.15);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-radius:18px;padding:20px 22px;cursor:pointer;transition:all .22s;text-decoration:none;display:flex;align-items:center;gap:16px}
+.rcard:hover{background:rgba(255,255,255,.15);transform:translateY(-2px);box-shadow:0 12px 40px rgba(0,0,0,.3)}
+.rcard:active{transform:scale(.97)}
+.rcard-icon{font-size:32px;flex-shrink:0;width:52px;height:52px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.1);border-radius:14px;border:1px solid rgba(255,255,255,.15)}
+.rcard-text{}
+.rcard-title{font-size:15px;font-weight:800;color:white;margin-bottom:3px}
+.rcard-sub{font-size:12px;color:rgba(255,255,255,.5)}
+.rcard-arrow{margin-left:auto;font-size:18px;color:rgba(255,255,255,.35);flex-shrink:0}
+.coord-btn{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08)}
+footer{text-align:center;padding:20px;font-size:11px;color:rgba(255,255,255,.2);position:relative;z-index:1}
 </style>
 </head>
 <body>
-
-<div id="loading" class="loading-overlay"><div id="loading-msg">Carregando...</div></div>
-
-<div id="screen-login" class="screen on">
-    <div class="card">
-        <h2 style="text-align:center">Acesso do Aluno</h2>
-        <p style="font-size:12px; color:#666; text-align:center">Escolha seu período e faça login</p>
-        
-        <div id="periodos" style="text-align:center; margin-bottom:15px;">
-            <div class="pbtn" onclick="selecionarPeriodo('5º Período')" data-p="5º Período">5º</div>
-            <div class="pbtn" onclick="selecionarPeriodo('6º Período')" data-p="6º Período">6º</div>
-            <div class="pbtn" onclick="selecionarPeriodo('7º Período')" data-p="7º Período">7º</div>
-            <div class="pbtn" onclick="selecionarPeriodo('8º Período')" data-p="8º Período">8º</div>
-            <div class="pbtn" onclick="selecionarPeriodo('9º Período')" data-p="9º Período">9º</div>
-            <div class="pbtn" onclick="selecionarPeriodo('10º Período')" data-p="10º Período">10º</div>
-        </div>
-
-        <input type="text" id="login-ra" placeholder="Digite seu RA">
-        <input type="text" id="login-nome" placeholder="Nome Completo">
-        <button id="btn-login" class="btn" onclick="fazerLogin()">ENTRAR NA CADERNETA</button>
-    </div>
+<div class="wrap">
+  <div class="logo-wrap">
+    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" width="100" height="100">
+      <circle cx="100" cy="100" r="100" fill="#3A7D44"/>
+      <circle cx="38" cy="118" r="9" fill="white"/>
+      <path d="M56 82 Q56 62 76 62 L86 62 L86 74 L78 74 Q70 74 70 82 L70 92 L84 92 L84 104 L70 104 L70 140 L56 140 Z" fill="white"/>
+      <path d="M90 92 L104 92 L104 102 Q108 92 118 92 Q128 92 130 102 Q134 92 144 92 L158 92 L158 140 L144 140 L144 108 Q144 102 138 102 Q132 102 132 108 L132 140 L118 140 L118 108 Q118 102 112 102 Q106 102 106 108 L106 140 L90 140 Z" fill="white"/>
+      <path d="M175 108 Q168 100 156 100 Q144 100 140 108 Q136 116 140 124 Q144 132 156 132 Q168 132 175 124" stroke="white" stroke-width="13" fill="none" stroke-linecap="round"/>
+    </svg>
+  </div>
+  <h1>Caderneta Digital de Estágio</h1>
+  <h2>Faculdade de Medicina de Campos</h2>
+  <div class="fbpn">Fundação Benedito Pereira Nunes · Campos dos Goytacazes, RJ</div>
+  <div class="semestre">Semestre 2026.1 · Firebase v2.0</div>
+  <div class="cards">
+    <a href="caderneta-aluno.html" class="rcard">
+      <div class="rcard-icon">👨‍⚕️</div>
+      <div class="rcard-text"><div class="rcard-title">Sou Aluno</div><div class="rcard-sub">Registrar plantões e ver histórico</div></div>
+      <div class="rcard-arrow">›</div>
+    </a>
+    <a href="caderneta-preceptor.html" class="rcard">
+      <div class="rcard-icon">🩺</div>
+      <div class="rcard-text"><div class="rcard-title">Sou Preceptor</div><div class="rcard-sub">Gerar tokens e acompanhar presenças</div></div>
+      <div class="rcard-arrow">›</div>
+    </a>
+    <a href="coordenacao.html" class="rcard coord-btn">
+      <div class="rcard-icon">📊</div>
+      <div class="rcard-text"><div class="rcard-title">Coordenação</div><div class="rcard-sub">Dashboard e relatórios · acesso restrito</div></div>
+      <div class="rcard-arrow">›</div>
+    </a>
+  </div>
 </div>
-
-<div id="screen-menu" class="screen">
-    <div class="topbar" style="background:var(--p); color:white; padding:10px; border-radius:8px; margin-bottom:15px;">
-        <div id="tb-nome" style="font-weight:bold">Nome</div>
-        <div id="tb-sub" style="font-size:12px">RA</div>
-    </div>
-
-    <div id="hero-prog"></div>
-
-    <div class="card" style="margin-top:20px">
-        <button class="btn" onclick="irReg()">+ REGISTRAR PLANTÃO</button>
-        <button class="btn" style="background:#64748b; margin-top:10px;" onclick="irHist()">VER MEU HISTÓRICO</button>
-    </div>
-
-    <div id="perfil-card" class="card" style="font-size:12px">
-        <div id="perfil-nome"></div>
-        <div id="perfil-ra"></div>
-        <div id="perfil-per"></div>
-    </div>
-</div>
-
-<div id="screen-reg" class="screen">
-    <button class="btn" style="background:#64748b" onclick="voltarMenu()">← Voltar</button>
-    <div class="card" style="margin-top:15px">
-        <h3>Novo Registro</h3>
-        <select id="r-hosp"></select>
-        <input type="text" id="r-prec" placeholder="Nome do Preceptor">
-        <input type="text" id="r-token" placeholder="Token (4 dígitos)">
-        <button class="btn" onclick="toast('Funcionalidade em teste','err')">REGISTRAR AGORA</button>
-    </div>
-</div>
-
-<div id="screen-hist" class="screen">
-    <button class="btn" style="background:#64748b" onclick="voltarMenu()">← Voltar</button>
-    <div class="card" style="margin-top:15px">
-        <h3>Seu Histórico</h3>
-        <div id="hist-card">Nenhum plantão confirmado.</div>
-    </div>
-</div>
-
-<div id="toast" class="toast"></div>
-
+<footer>Caderneta Digital FMC · 2026 · Powered by Firebase</footer>
 </body>
 </html>
