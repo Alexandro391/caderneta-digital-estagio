@@ -1,278 +1,199 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Caderneta FMC · Aluno</title>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script>
-// ── CONFIGURAÇÃO ─────────────────────────────────────────────
-const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby6aS95ywHvv7Zkpt1RuiU6ACVui3i8c7seqxlNjsyL3nBwR5fxOUx284hZkFPvHM8j/exec";
-const TOTAL_PLANTOES = 20;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Caderneta FMC">
+  <meta name="theme-color" content="#1E5128">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="1000281242.png">
+  <title>Caderneta FMC · Aluno</title>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script>
+    const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby6aS95ywHvv7Zkpt1RuiU6ACVui3i8c7seqxlNjsyL3nBwR5fxOUx284hZkFPvHM8j/exec";
+    const TOTAL_PLANTOES = 20;
 
-const COR = {
-  "5º Período":  { p:"#1D4ED8", l:"#DBEAFE", g:"linear-gradient(135deg,#1D4ED8,#3B82F6)", emoji:"🔵" },
-  "6º Período":  { p:"#0891B2", l:"#CFFAFE", g:"linear-gradient(135deg,#0891B2,#22D3EE)", emoji:"🩵" },
-  "7º Período":  { p:"#059669", l:"#D1FAE5", g:"linear-gradient(135deg,#059669,#34D399)", emoji:"🟢" },
-  "8º Período":  { p:"#166534", l:"#DCFCE7", g:"linear-gradient(135deg,#166534,#16A34A)", emoji:"💚" }
-};
+    const COR = {
+      "5º Período": { p: "#1D4ED8", l: "#DBEAFE", g: "linear-gradient(135deg,#1D4ED8,#3B82F6)", emoji: "🔵" },
+      "6º Período": { p: "#0891B2", l: "#CFFAFE", g: "linear-gradient(135deg,#0891B2,#22D3EE)", emoji: "🩵" },
+      "7º Período": { p: "#059669", l: "#D1FAE5", g: "linear-gradient(135deg,#059669,#34D399)", emoji: "🟢" },
+      "8º Período": { p: "#166534", l: "#DCFCE7", g: "linear-gradient(135deg,#166534,#16A34A)", emoji: "💚" },
+      "9º Período": { p: "#7C3AED", l: "#EDE9FE", g: "linear-gradient(135deg,#7C3AED,#A78BFA)", emoji: "🟣" },
+      "10º Período": { p: "#C2410C", l: "#FFEDD5", g: "linear-gradient(135deg,#C2410C,#F97316)", emoji: "🟠" },
+      "11º Período": { p: "#B45309", l: "#FEF3C7", g: "linear-gradient(135deg,#B45309,#F59E0B)", emoji: "🟡" },
+      "12º Período": { p: "#9F1239", l: "#FFE4E6", g: "linear-gradient(135deg,#9F1239,#E11D48)", emoji: "🔴" },
+    };
 
-const ESPECIALIDADES = {
-  "5º Período":  ["Clínica Médica I"],
-  "6º Período":  ["Clínica Médica II"],
-  "7º Período":  ["Pediatria I","Clínica Cirúrgica","Obstetrícia","Ginecologia","Medicina Intensiva","DIP"],
-  "8º Período":  ["Pediatria II","Clínica Cirúrgica II","Urologia","Oftalmologia","Otorrinolaringologia","Dermatologia","Ortopedia e Traumatologia"]
-};
-</script>
-<style>
-:root{
-  --p:#1D4ED8;--pl:#DBEAFE;--pg:linear-gradient(135deg,#1D4ED8,#3B82F6);
-  --fmc-v:#3A7D44;--fmc-vd:#1E5128;--fmc-vl:#D6EDD9;
-  --g50:#F8FAFC;--g100:#F1F5F9;--g200:#E2E8F0;--g400:#94A3B8;
-  --g500:#64748B;--g700:#334155;--g900:#0F172A;
-  --font:'Sora',sans-serif;--r:16px;--rsm:10px;--sh:0 4px 24px rgba(0,0,0,.09);
-}
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{font-family:var(--font);background:var(--g100);color:var(--g900);min-height:100vh}
-.screen{display:none}.screen.on{display:block;animation:up .3s ease}
-@keyframes up{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    const HOSPITAIS = [
+      "Hospital de Guarus",
+      "Hospital Ferreira Machado",
+      "Santa Casa de Misericórdia",
+      "Hospital Plantadores de Cana",
+      "Hospital São José",
+      "UBS Farol",
+      "Beneficência Portuguesa",
+      "Hospital Álvaro Alvim",
+      "UPA 24 Horas",
+    ];
 
-/* TOPBAR */
-.topbar{color:white;padding:0 18px;height:58px;display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:50;box-shadow:0 2px 16px rgba(0,0,0,.22);transition:background .45s}
-.tb-title{font-size:14px;font-weight:700;letter-spacing:-.3px}
-.tb-sub{font-size:10.5px;color:rgba(255,255,255,.55)}
-.tb-back{margin-left:auto;background:rgba(255,255,255,.15);border:none;color:white;border-radius:99px;padding:6px 14px;font-family:var(--font);font-size:12px;font-weight:700;cursor:pointer}
+    const ESPECIALIDADES = {
+      "5º Período": ["Clínica Médica I"],
+      "6º Período": ["Clínica Médica II"],
+      "7º Período": ["Pediatria I", "Clínica Cirúrgica", "Obstetrícia", "Ginecologia", "Medicina Intensiva", "DIP"],
+      "8º Período": ["Pediatria II", "Clínica Cirúrgica II", "Urologia", "Oftalmologia", "Otorrinolaringologia", "Dermatologia", "Ortopedia e Traumatologia"],
+      
+      };
 
-.container{max-width:480px;margin:0 auto;padding:20px 16px 64px}
-.card{background:white;border-radius:var(--r);border:1px solid var(--g200);box-shadow:var(--sh);overflow:hidden;margin-bottom:16px}
-.card-head{padding:15px 20px;border-bottom:1px solid var(--g100);display:flex;align-items:center;gap:9px}
-.card-head h2{font-size:14px;font-weight:700;color:var(--g900)}
-.card-body{padding:20px}
+    // Funções de manipulação de foto
+    function abrirModalFoto() {
+      const modalFoto = document.getElementById('modal-foto');
+      modalFoto.style.display = 'flex'; // Abre o modal
+    }
 
-/* LOGIN */
-.login-wrap{min-height:100vh;display:flex;flex-direction:column;background:linear-gradient(160deg,#1E5128 0%,#3A7D44 55%,#166534 100%);position:relative;overflow:hidden}
-.banner{background:rgba(0,0,0,.2);padding:28px 24px 22px;text-align:center;border-bottom:1px solid rgba(255,255,255,.1)}
-.banner h1{font-size:18px;font-weight:800;color:white;letter-spacing:-.4px;margin-bottom:3px}
-.banner h2{font-size:12px;font-weight:400;color:rgba(255,255,255,.7);margin-bottom:4px}
+    function fecharModalFoto() {
+      const modalFoto = document.getElementById('modal-foto');
+      modalFoto.style.display = 'none'; // Fecha o modal
+    }
 
-.login-body{padding:20px;max-width:440px;margin:0 auto;width:100%;flex:1}
-.lcard{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(20px);border-radius:18px;padding:22px}
-.lcard-title{font-size:15px;font-weight:800;color:white;margin-bottom:2px}
-.lcard-sub{font-size:12px;color:rgba(255,255,255,.5);margin-bottom:18px}
+    function removerFoto() {
+      const modalImg = document.getElementById('modal-img');
+      const modalPh = document.getElementById('modal-ph');
+      modalImg.style.display = 'none';
+      modalPh.style.display = 'flex'; // Exibe o emoji de placeholder
+      document.getElementById('btn-del-foto').style.display = 'none';
+    }
 
-/* PERÍODO */
-.periodo-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px}
-.pbtn{padding:10px 4px;border-radius:11px;border:2px solid transparent;background:rgba(255,255,255,.08);color:rgba(255,255,255,.65);font-size:10px;font-weight:700;cursor:pointer;text-align:center;transition:all .2s}
-.pbtn.sel{border-color:white;color:white;background:rgba(255,255,255,0.2)}
-.pbtn .pe{font-size:18px;display:block;margin-bottom:2px}
+    // Função de login
+    function fazerLogin() {
+      const ra = document.getElementById('login-ra').value;
+      const nome = document.getElementById('login-nome').value;
+      const periodo = document.querySelector('.pbtn.sel').dataset.p;
+      console.log(`Login feito com RA: ${ra}, Nome: ${nome}, Período: ${periodo}`);
+    }
 
-/* FORM */
-.fg{margin-bottom:12px}
-.fg label{display:block;font-size:11px;font-weight:700;color:rgba(255,255,255,.65);margin-bottom:6px;text-transform:uppercase}
-.fg.lt label{color:var(--g700)}
-.fg input,.fg select{width:100%;padding:11px 13px;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);border-radius:var(--rsm);color:white;font-family:var(--font);font-size:14px}
-.fg.lt input,.fg.lt select{background:var(--g50);border-color:var(--g200);color:var(--g900)}
-.fg select option{background:#1E5128;color:white}
-.fg.lt select option{background:white;color:var(--g900)}
+    // Função de seleção de período
+    function selPeriodo(element) {
+      const periodo = element.getAttribute('data-p');
+      const cor = COR[periodo];
+      if (cor) {
+        document.body.style.backgroundColor = cor.p; // Muda a cor de fundo
+      }
+    }
 
-/* BOTÕES */
-.btn{width:100%;padding:13px;border:none;border-radius:var(--rsm);font-family:var(--font);font-size:15px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
-.btn-p{background:var(--p);color:white}
-.btn-login{background:white;color:#1E5128}
+    // Função para abrir a galeria de fotos
+    function abrirGaleria() {
+      const fotoInput = document.getElementById('foto-input');
+      fotoInput.click(); // Simula o clique no input de arquivo
+    }
 
-/* HERO PROGRES */
-.hero{border-radius:var(--r);padding:20px;color:white;margin-bottom:16px;position:relative;overflow:hidden}
-.hero::after{content:'🏥';position:absolute;right:14px;bottom:-8px;font-size:80px;opacity:.07;pointer-events:none}
-.hero-num{font-size:48px;font-weight:800;letter-spacing:-3px;line-height:1}
-.hero-num span{font-size:18px;font-weight:400;color:rgba(255,255,255,.4)}
-.prog-track{height:7px;background:rgba(255,255,255,.2);border-radius:99px;margin:12px 0}
-.prog-fill{height:100%;border-radius:99px;background:rgba(255,255,255,.9);transition:width 1s}
+    // Função para processar foto
+    function processarFoto(event) {
+      const file = event.target.files[0];
+      const modalImg = document.getElementById('modal-img');
+      const modalPh = document.getElementById('modal-ph');
+      const reader = new FileReader();
 
-/* HISTÓRICO */
-.hrow{padding:12px 16px;border-bottom:1px solid var(--g100);display:flex;align-items:center;gap:12px}
-.hinfo{flex:1}
-.hdata{font-size:13px;font-weight:700;color:var(--g900)}
-.hlocal{font-size:11px;color:var(--g500)}
+      reader.onload = function(e) {
+        modalImg.src = e.target.result;
+        modalImg.style.display = 'block';
+        modalPh.style.display = 'none';
+        document.getElementById('btn-del-foto').style.display = 'block';
+      };
 
-.loading-overlay{position:fixed;inset:0;background:rgba(15,23,42,.7);z-index:300;display:none;align-items:center;justify-content:center;color:white}
-.loading-overlay.on{display:flex}
-</style>
+      reader.readAsDataURL(file);
+    }
+  </script>
 </head>
 <body>
 
-<div class="loading-overlay" id="loading">Aguarde...</div>
-
-<div id="screen-login" class="screen on">
-<div class="login-wrap">
-  <div class="banner">
-    <h1>FMC</h1>
-    <h2>Caderneta Digital de Estágio</h2>
+  <!-- Loading overlay -->
+  <div class="loading-overlay" id="loading">
+    <div class="spinner-lg"></div>
+    <div class="loading-msg" id="loading-msg">Aguarde...</div>
   </div>
-  <div class="login-body">
-    <div class="lcard">
-      <div class="lcard-title">Entrar como Aluno</div>
-      <div class="lcard-sub">Preencha seus dados para acessar</div>
-      <div class="fg"><label>Matrícula (RA)</label><input type="number" id="login-ra" placeholder="Ex: 2022001"></div>
-      <div class="fg"><label>Nome Completo</label><input type="text" id="login-nome" placeholder="Seu nome completo"></div>
-      <div class="periodo-grid">
-        <button class="pbtn sel" data-p="5º Período" onclick="selPeriodo(this)"><span class="pe">🔵</span>5º Per.</button>
-        <button class="pbtn" data-p="6º Período" onclick="selPeriodo(this)"><span class="pe">🩵</span>6º Per.</button>
-        <button class="pbtn" data-p="7º Período" onclick="selPeriodo(this)"><span class="pe">🟢</span>7º Per.</button>
-        <button class="pbtn" data-p="8º Período" onclick="selPeriodo(this)"><span class="pe">💚</span>8º Per.</button>
-      </div>
-      <button class="btn btn-login" onclick="fazerLogin()">Entrar na Caderneta →</button>
+
+  <!-- Input galeria oculto -->
+  <input type="file" id="foto-input" accept="image/*" style="display:none" onchange="processarFoto(event)">
+
+  <!-- Modal foto -->
+  <div class="modal-ov" id="modal-foto" onclick="fecharModalFoto()">
+    <div class="modal-sh">
+      <div class="modal-handle"></div>
+      <div class="modal-title">Foto do Aluno</div>
+      <div class="modal-sub">Aparece no seu perfil e em cada plantão do histórico</div>
+      <div id="modal-ph" class="modal-prev-ph">👤</div>
+      <img id="modal-img" class="modal-prev" src="" alt="" style="display:none">
+      <button class="mbtn2 mbtn2-ok" onclick="abrirGaleria()">🖼️ Escolher da galeria</button>
+      <button class="mbtn2 mbtn2-del" id="btn-del-foto" onclick="removerFoto()" style="display:none">🗑️ Remover foto</button>
+      <button class="mbtn2 mbtn2-cancel" onclick="fecharModalFoto()">Cancelar</button>
     </div>
   </div>
-</div>
-</div>
 
-<div id="screen-menu" class="screen">
-  <div class="topbar" id="tb-menu">
-    <div style="flex:1"><div class="tb-title" id="tb-nome">—</div><div class="tb-sub" id="tb-sub">—</div></div>
-    <button class="tb-back" onclick="sair()">Sair</button>
-  </div>
-  <div class="container">
-    <div id="hero-area"></div>
-    <button class="btn btn-p" onclick="irReg()" style="margin-bottom:16px">+ REGISTRAR PRESENÇA</button>
-    <div class="card">
-      <div class="card-head"><h2>Histórico de Atividades</h2></div>
-      <div id="lista-hist"></div>
-    </div>
-  </div>
-</div>
-
-<div id="screen-reg" class="screen">
-  <div class="topbar" id="tb-reg">
-    <div class="tb-title">Registrar Atividade</div>
-    <button class="tb-back" onclick="ir('screen-menu')">← Voltar</button>
-  </div>
-  <div class="container">
-    <div class="card">
-      <div class="card-body">
-        <div class="fg lt"><label>Hospital</label>
-          <select id="r-hosp">
-            <option value="">Selecionar hospital...</option>
-            <option>Hospital Ferreira Machado</option>
-            <option>Hospital de Guarus</option>
-            <option>Santa Casa</option>
-            <option>UPA 24h</option>
-          </select>
+  <!-- ════ LOGIN ════════════════════════════════════════════════ -->
+  <div id="screen-login" class="screen on">
+    <div class="login-wrap">
+      <div class="banner">
+        <!-- Logo FMC SVG fiel à marca: círculo verde com ".fmc" -->
+        <div class="banner-logo-wrap">
+          <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" width="90" height="90">
+            <circle cx="100" cy="100" r="100" fill="#3A7D44"/>
+            <circle cx="38" cy="118" r="9" fill="white"/>
+            <path d="M56 82 Q56 62 76 62 L86 62 L86 74 L78 74 Q70 74 70 82 L70 92 L84 92 L84 104 L70 104 L70 140 L56 140 Z" fill="white"/>
+            <path d="M90 92 L104 92 L104 102 Q108 92 118 92 Q128 92 130 102 Q134 92 144 92 L158 92 L158 140 L144 140 L144 108 Q144 102 138 102 Q132 102 132 108 L132 140 L118 140 L118 108 Q118 102 112 102 Q106 102 106 108 L106 140 L90 140 Z" fill="white"/>
+            <path d="M175 108 Q168 100 156 100 Q144 100 140 108 Q136 116 140 124 Q144 132 156 132 Q168 132 175 124" stroke="white" stroke-width="13" fill="none" stroke-linecap="round"/>
+          </svg>
         </div>
-        <div class="fg lt"><label>Especialidade</label><select id="r-setor"></select></div>
-        <div class="fg lt"><label>Preceptor Responsável</label><input type="text" id="r-prec" placeholder="Nome do Médico"></div>
-        <div class="fg lt"><label>Token de Validação</label><input type="password" id="r-token" placeholder="Senha do Dia" style="text-align:center; letter-spacing:5px"></div>
-        <button class="btn btn-p" id="btn-salvar" onclick="salvar()">CONFIRMAR PRESENÇA</button>
+        <h1>Faculdade de Medicina de Campos</h1>
+        <h2>Caderneta Digital de Estágio Hospitalar</h2>
+        <div class="fbpn">Fundação Benedito Pereira Nunes · Campos dos Goytacazes, RJ</div>
+        <div class="semestre">Semestre 2026.1 · v1.0</div>
+      </div>
+
+      <div class="login-body">
+        <div class="lcard">
+          <div class="role-badge">👨‍⚕️ Acesso do Aluno</div>
+          <div class="lcard-title">Entrar como Aluno</div>
+          <div class="lcard-sub">Preencha seus dados para acessar sua caderneta</div>
+
+          <!-- Foto -->
+          <div class="foto-upload-area" onclick="abrirModalFoto()">
+            <div class="foto-circulo" id="login-circulo">
+              <span id="login-emoji">👤</span>
+              <img id="login-img" src="" alt="" style="display:none">
+            </div>
+            <div>
+              <div class="foto-upload-title">Foto do Aluno</div>
+              <div class="foto-upload-sub">Aparece no perfil e no histórico</div>
+              <span class="foto-upload-pill">📂 Escolher da galeria</span>
+            </div>
+          </div>
+
+          <div class="fg"><label>Matrícula (RA)</label><input type="text" id="login-ra" placeholder="Ex: 2022001" inputmode="numeric" autocomplete="off"></div>
+          <div class="fg"><label>Nome Completo</label><input type="text" id="login-nome" placeholder="Seu nome completo" autocomplete="name"></div>
+
+          <div class="periodo-label">Período Acadêmico — Selecione</div>
+          <div class="periodo-grid">
+            <button class="pbtn sel" data-p="5º Período" onclick="selPeriodo(this)"><span class="pe">🔵</span><span class="pn">5º Per.</span></button>
+            <button class="pbtn" data-p="6º Período" onclick="selPeriodo(this)"><span class="pe">🩵</span><span class="pn">6º Per.</span></button>
+            <button class="pbtn" data-p="7º Período" onclick="selPeriodo(this)"><span class="pe">🟢</span><span class="pn">7º Per.</span></button>
+            <button class="pbtn" data-p="8º Período" onclick="selPeriodo(this)"><span class="pe">💚</span><span class="pn">8º Per.</span></button>
+            <button class="pbtn" data-p="9º Período" onclick="selPeriodo(this)"><span class="pe">🟣</span><span class="pn">9º Per.</span></button>
+            <button class="pbtn" data-p="10º Período" onclick="selPeriodo(this)"><span class="pe">🟠</span><span class="pn">10º Per.</span></button>
+            <button class="pbtn" data-p="11º Período" onclick="selPeriodo(this)"><span class="pe">🟡</span><span class="pn">11º Per.</span></button>
+            <button class="pbtn" data-p="12º Período" onclick="selPeriodo(this)"><span class="pe">🔴</span><span class="pn">12º Per.</span></button>
+          </div>
+
+          <button class="btn btn-login" id="btn-login" onclick="fazerLogin()">Entrar na Caderneta →</button>
+          <div style="text-align:center;margin-top:14px">
+            <a href="index.html" style="color:rgba(255,255,255,.4);font-size:12px;text-decoration:none">← Voltar à tela inicial</a>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<script>
-let USER = JSON.parse(localStorage.getItem('fmc_user')) || null;
-let PERIODO_SEL = "5º Período";
-
-window.onload = () => {
-  const params = new URLSearchParams(window.location.search);
-  if(params.get('nome')) {
-    USER = { nome: params.get('nome'), ra: params.get('ra'), periodo: params.get('periodo') + "º Período" };
-    localStorage.setItem('fmc_user', JSON.stringify(USER));
-  }
-  if(USER) loginSucesso();
-};
-
-function ir(id) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('on'));
-  document.getElementById(id).classList.add('on');
-}
-
-function selPeriodo(btn) {
-  document.querySelectorAll('.pbtn').forEach(b => b.classList.remove('sel'));
-  btn.classList.add('sel');
-  PERIODO_SEL = btn.getAttribute('data-p');
-}
-
-function fazerLogin() {
-  const ra = document.getElementById('login-ra').value;
-  const nome = document.getElementById('login-nome').value;
-  if(!ra || !nome) return alert("Preencha todos os campos!");
-  USER = { ra, nome, periodo: PERIODO_SEL };
-  localStorage.setItem('fmc_user', JSON.stringify(USER));
-  loginSucesso();
-}
-
-function loginSucesso() {
-  document.getElementById('tb-nome').innerText = USER.nome;
-  document.getElementById('tb-sub').innerText = `${USER.ra} • ${USER.periodo}`;
-  document.getElementById('tb-menu').style.background = COR[USER.periodo].p;
-  carregarDados();
-  ir('screen-menu');
-}
-
-async function carregarDados() {
-  try {
-    const res = await fetch(`${APPS_SCRIPT_URL}?action=aluno&ra=${USER.ra}`);
-    const data = await res.json();
-    const lista = data.registros || [];
-    renderizarProgresso(lista.length);
-    renderizarLista(lista);
-  } catch(e) { console.error(e); }
-}
-
-function renderizarProgresso(qtd) {
-  const pct = Math.min(100, (qtd/TOTAL_PLANTOES)*100);
-  const cor = COR[USER.periodo];
-  document.getElementById('hero-area').innerHTML = `
-    <div class="hero" style="background:${cor.g}">
-      <div class="hero-num">${qtd}<span>/${TOTAL_PLANTOES}</span></div>
-      <div style="font-size:11px; opacity:0.7">PLANTÕES CONCLUÍDOS</div>
-      <div class="prog-track"><div class="prog-fill" style="width:${pct}%"></div></div>
-    </div>`;
-}
-
-function renderizarLista(lista) {
-  const cont = document.getElementById('lista-hist');
-  if(lista.length === 0) return cont.innerHTML = '<p style="padding:30px; text-align:center; color:#999">Nenhum registro encontrado.</p>';
-  cont.innerHTML = lista.map(r => `
-    <div class="hrow">
-      <div class="hinfo"><div class="hdata">${r.data}</div><div class="hlocal">${r.hospital} • ${r.professor}</div></div>
-      <div style="font-size:10px; font-weight:bold; color:#059669">✓ OK</div>
-    </div>`).join('');
-}
-
-function irReg() {
-  const sel = document.getElementById('r-setor');
-  const lista = ESPECIALIDADES[USER.periodo] || [];
-  sel.innerHTML = lista.map(e => `<option>${e}</option>`).join('');
-  document.getElementById('tb-reg').style.background = COR[USER.periodo].p;
-  ir('screen-reg');
-}
-
-async function salvar() {
-  const btn = document.getElementById('btn-salvar');
-  const dados = {
-    nome: USER.nome, matricula: USER.ra, periodo: USER.periodo,
-    dataEstagio: new Date().toLocaleDateString('pt-BR'),
-    diaSemana: new Date().toLocaleDateString('pt-BR', {weekday:'long'}),
-    hospital: document.getElementById('r-hosp').value,
-    professor: document.getElementById('r-prec').value,
-    tokenProfessor: document.getElementById('r-token').value
-  };
-
-  if(!dados.hospital || !dados.professor || !dados.tokenProfessor) return alert("Preencha tudo!");
-  
-  btn.disabled = true; document.getElementById('loading').classList.add('on');
-
-  try {
-    const resp = await fetch(APPS_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(dados) });
-    alert("Registro enviado com sucesso!");
-    location.reload();
-  } catch(e) {
-    alert("Erro na conexão.");
-    btn.disabled = false; document.getElementById('loading').classList.remove('on');
-  }
-}
-
-function sair() { if(confirm("Deseja sair?")) { localStorage.clear(); location.href = "index.html"; } }
-</script>
 </body>
 </html>
