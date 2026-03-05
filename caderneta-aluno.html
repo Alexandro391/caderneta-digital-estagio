@@ -42,7 +42,7 @@ const HOSPITAIS = ["Hospital de Guarus","Hospital Ferreira Machado","Santa Casa 
 const ESPECIALIDADES = {
   "5º Período":  ["Clínica Médica I"],
   "6º Período":  ["Clínica Médica II"],
-  "7º Período":  ["Pediatria I","Clínica Cirúrgica","Obstetrícia","Ginecologia","Medicina Intensiva","DIP"],
+  "7º Período":  ["Pediatria I","Clínica Cirúrgica","Obstetrícia","Ginecologia","Medicina Intensiva","DIP,Psiquiatria"],
   "8º Período":  ["Pediatria II","Clínica Cirúrgica II","Urologia","Oftalmologia","Otorrinolaringologia","Dermatologia","Ortopedia e Traumatologia"],
   "9º Período":  ["Clínica Médica","Cirurgia","Ginecologia e Obstetrícia","Pediatria","Saúde Mental"],
   "10º Período": ["Internato Clínica Médica","Internato Cirurgia"],
@@ -412,16 +412,16 @@ body{font-family:var(--font);background:var(--g100);color:var(--g900);min-height
 <!-- LOGIN -->
 <div id="screen-login" class="screen on">
 <div class="login-wrap">
-  <div class="banner">
-    <div class="banner-logo-wrap">
-      <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" width="90" height="90">
-        <circle cx="100" cy="100" r="100" fill="#3A7D44"/>
-        <circle cx="38" cy="118" r="9" fill="white"/>
-        <path d="M56 82 Q56 62 76 62 L86 62 L86 74 L78 74 Q70 74 70 82 L70 92 L84 92 L84 104 L70 104 L70 140 L56 140 Z" fill="white"/>
-        <path d="M90 92 L104 92 L104 102 Q108 92 118 92 Q128 92 130 102 Q134 92 144 92 L158 92 L158 140 L144 140 L144 108 Q144 102 138 102 Q132 102 132 108 L132 140 L118 140 L118 108 Q118 102 112 102 Q106 102 106 108 L106 140 L90 140 Z" fill="white"/>
-        <path d="M175 108 Q168 100 156 100 Q144 100 140 108 Q136 116 140 124 Q144 132 156 132 Q168 132 175 124" stroke="white" stroke-width="13" fill="none" stroke-linecap="round"/>
-      </svg>
+<header class="header-plataforma">
+  <div class="brand-container">
+    <div class="brand-box">FMC</div>
+    <div class="brand-text-area">
+      <h1 class="brand-main-title">MINHA CADERNETA</h1>
+      <span class="brand-sub-title">Curso de Medicina · Internato</span>
     </div>
+  </div>
+  <div class="screen-tag">PAINEL DO ACADÊMICO</div>
+</header>
     <h1>Faculdade de Medicina de Campos</h1>
     <h2>Caderneta Digital de Estágio Hospitalar</h2>
     <div class="fbpn">Fundação Benedito Pereira Nunes · Campos dos Goytacazes, RJ</div>
