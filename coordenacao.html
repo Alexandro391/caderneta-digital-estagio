@@ -22,11 +22,11 @@ const app = initializeApp(FB);
 const db  = getFirestore(app);
 
 const TOTAL_PLANTOES = 20;
-const SENHA_COORD    = "fmc2026"; 
+const SENHA_COORD    = "fmc2026";
 
 let dadosAlunos=[], dadosPlantoes=[], resumoAlunos=[], sortCol='nome', sortAsc=true;
 
-// ── FUNÇÕES DE LOGIN ──
+// ── LOGIN ─────────────────────────────────────────────────────
 function entrar(){
   if(document.getElementById('login-senha').value === SENHA_COORD){
     document.getElementById('screen-login').classList.remove('on');
@@ -37,72 +37,42 @@ function entrar(){
     document.getElementById('login-senha').focus();
   }
 }
-function sair(){ location.reload(); }
-
-// ── NAVEGAÇÃO ──
-function navTo(pageId, nav){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
-  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  document.querySelectorAll('.mnav-item').forEach(m=>m.classList.remove('active'));
-  
-  const targetPage = document.getElementById(pageId);
-  if(targetPage) targetPage.classList.add('on');
-  if(nav) nav.classList.add('active');
+function sair(){
+  document.getElementById('screen-dash').classList.remove('on');
+  document.getElementById('screen-login').classList.add('on');
+  document.getElementById('login-senha').value='';
 }
 
-// Botão Voltar para Celular
-window.voltar = () => {
-    navTo('p-overview');
-    document.querySelector('.nav-item').classList.add('active');
-};
+// ── NAVEGAÇÃO ─────────────────────────────────────────────────
+function navTo(pageId,nav){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById(pageId).classList.add('on');
+  if(nav) nav.classList.add('active');
+}
 
 function atualizarData(){
   const agora=new Date();
   const el = document.getElementById('sb-data');
-  if(el) el.textContent=agora.toLocaleDateString('pt-BR')+' · '+agora.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  if(el) el.textContent=agora.toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'})+' · '+agora.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
 }
 
-// ── CARREGAR DADOS (CORRIGIDO SEM ORDERBY) ──
+// ── CARREGAR DADOS ────────────────────────────────────────────
 async function carregarDados(){
-  toast('Sincronizando...','ok');
+  toast('Carregando dados...','ok');
   try {
     const [snapA, snapP] = await Promise.all([
       getDocs(collection(db,'alunos')),
-      getDocs(query(collection(db,'plantoes'), where('status','==','Confirmado'))) 
+      getDocs(query(collection(db,'plantoes'), where('status','==','Confirmado'))),
     ]);
-    
     dadosAlunos   = snapA.docs.map(d=>({id:d.id,...d.data()})).filter(a=>a.ra&&a.nome);
     dadosPlantoes = snapP.docs.map(d=>({id:d.id,...d.data()}));
-    
     processarDados(); renderOverview(); renderTabelaAlunos(); renderTabelaPlantoes(); renderAlertas();
+    toast('Dados atualizados!','ok');
   } catch(e){
-    toast('Erro de conexão.','err');
-    console.error("Erro detalhado:", e);
+    toast('Erro ao carregar dados.','err'); console.error(e);
   }
 }
-
-function processarDados(){
-  resumoAlunos = dadosAlunos.map(a=>{
-    const pls = dadosPlantoes.filter(p=>String(p.ra)===String(a.ra));
-    const n=pls.length, pct=Math.round(n/TOTAL_PLANTOES*100);
-    const st=n>=TOTAL_PLANTOES?'ok':pct>=50?'and':'atr';
-    return{...a, plantoes:n, pct, status:st, ultimo:pls[pls.length-1]||null};
-  });
-}
-
-// ── FUNÇÕES GLOBAIS (Obrigatório para os botões funcionarem) ──
-window.entrar = entrar;
-window.sair = sair;
-window.navTo = navTo;
-window.carregarDados = carregarDados;
-window.salvarAluno = salvarAluno;
-window.filtrarTabela = filtrarTabela;
-window.filtrarPlantoes = filtrarPlantoes;
-window.sortBy = sortBy;
-window.exportarPDF = () => window.print();
-window.toast = toast;
-
-// ... (Mantenha o restante das suas funções de renderização abaixo como já estavam) ...
 
 function processarDados(){
   resumoAlunos = dadosAlunos.map(a=>{
@@ -123,38 +93,77 @@ function renderOverview(){
   const atrasados=resumoAlunos.filter(a=>a.status==='atr').length;
   const completos=resumoAlunos.filter(a=>a.status==='ok').length;
   const andamento=resumoAlunos.filter(a=>a.status==='and').length;
-  document.getElementById('kpi-alunos').textContent=total;
-  document.getElementById('kpi-plantoes').textContent=totalPlt;
-  document.getElementById('kpi-hoje').textContent='hoje: '+hojeN;
-  document.getElementById('kpi-media').textContent=media;
-  document.getElementById('kpi-atrasados').textContent=atrasados;
-  document.getElementById('ov-sub').textContent=total+' alunos · '+totalPlt+' plantões registrados · Semestre 2026.1';
+  
+  const elAlunos = document.getElementById('kpi-alunos');
+  if(elAlunos) elAlunos.textContent=total;
+  
+  const elPlantoes = document.getElementById('kpi-plantoes');
+  if(elPlantoes) elPlantoes.textContent=totalPlt;
+  
+  const elHoje = document.getElementById('kpi-hoje');
+  if(elHoje) elHoje.textContent='hoje: '+hojeN;
+  
+  const elMedia = document.getElementById('kpi-media');
+  if(elMedia) elMedia.textContent=media;
+  
+  const elAtrasados = document.getElementById('kpi-atrasados');
+  if(elAtrasados) elAtrasados.textContent=atrasados;
+
+  const elSub = document.getElementById('ov-sub');
+  if(elSub) elSub.textContent=total+' alunos · '+totalPlt+' plantões registrados · Semestre 2026.1';
+
   // Donut
   const pctG=total?Math.round((totalPlt/(total*TOTAL_PLANTOES))*100):0;
-  document.getElementById('donut-pct').textContent=pctG+'%';
-  document.getElementById('donut-fg').style.strokeDashoffset=314-(314*pctG/100);
-  document.getElementById('leg-ok').textContent=completos+' completos';
-  document.getElementById('leg-and').textContent=andamento+' em andamento';
-  document.getElementById('leg-at').textContent=atrasados+' atrasados';
+  const elDonutPct = document.getElementById('donut-pct');
+  if(elDonutPct) elDonutPct.textContent=pctG+'%';
+  
+  const elDonutFg = document.getElementById('donut-fg');
+  if(elDonutFg) elDonutFg.style.strokeDashoffset=314-(314*pctG/100);
+
+  const elLegOk = document.getElementById('leg-ok');
+  if(elLegOk) elLegOk.textContent=completos+' completos';
+  
+  const elLegAnd = document.getElementById('leg-and');
+  if(elLegAnd) elLegAnd.textContent=andamento+' em andamento';
+  
+  const elLegAt = document.getElementById('leg-at');
+  if(elLegAt) elLegAt.textContent=atrasados+' atrasados';
+
   const badge=document.getElementById('badge-alerta');
-  if(atrasados>0){badge.textContent=atrasados;badge.style.display='inline';}else badge.style.display='none';
+  if(badge){
+    if(atrasados>0){badge.textContent=atrasados;badge.style.display='inline';}else badge.style.display='none';
+  }
+
   // Prog list
   const sorted=[...resumoAlunos].sort((a,b)=>b.plantoes-a.plantoes).slice(0,10);
-  document.getElementById('prog-count').textContent=resumoAlunos.length+' alunos';
-  document.getElementById('prog-list').innerHTML=sorted.map(a=>{
-    const cor=a.status==='ok'?'var(--greenl)':a.status==='and'?'var(--gold)':'var(--red)';
-    return`<div class="prog-item"><div class="prog-avatar">${a.nome.charAt(0)}</div><div class="prog-info"><div class="prog-nome">${a.nome}</div><div class="prog-per">${a.periodo}</div></div><div class="prog-bar-wrap"><div class="prog-bar-track"><div class="prog-bar-fill" style="width:${a.pct}%;background:${cor}"></div></div><div class="prog-num">${a.plantoes}/${TOTAL_PLANTOES}</div></div></div>`;
-  }).join('')||'<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-txt">Sem dados</div></div>';
+  const elProgCount = document.getElementById('prog-count');
+  if(elProgCount) elProgCount.textContent=resumoAlunos.length+' alunos';
+  
+  const elProgList = document.getElementById('prog-list');
+  if(elProgList){
+    elProgList.innerHTML=sorted.map(a=>{
+      const cor=a.status==='ok'?'var(--greenl)':a.status==='and'?'var(--gold)':'var(--red)';
+      return `<div class="prog-item"><div class="prog-avatar">${a.nome.charAt(0)}</div><div class="prog-info"><div class="prog-nome">${a.nome}</div><div class="prog-per">${a.periodo}</div></div><div class="prog-bar-wrap"><div class="prog-bar-track"><div class="prog-bar-fill" style="width:${a.pct}%;background:${cor}"></div></div><div class="prog-num">${a.plantoes}/${TOTAL_PLANTOES}</div></div></div>`;
+    }).join('')||'<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-txt">Sem dados</div></div>';
+  }
+
   // Hospitais
   const hC={};dadosPlantoes.forEach(p=>{hC[p.hospital]=(hC[p.hospital]||0)+1;});
   const hA=Object.entries(hC).sort((a,b)=>b[1]-a[1]).slice(0,6);
   const mH=hA[0]?.[1]||1;
-  document.getElementById('chart-hosp').innerHTML=hA.map(([h,n])=>`<div class="bar-row"><div class="bar-lbl" title="${h}">${h}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(n/mH*100)}%"></div></div><div class="bar-val">${n}</div></div>`).join('')||'<div style="color:var(--text3);font-size:12px">Sem dados</div>';
+  const elChartHosp = document.getElementById('chart-hosp');
+  if(elChartHosp){
+    elChartHosp.innerHTML=hA.map(([h,n])=>`<div class="bar-row"><div class="bar-lbl" title="${h}">${h}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(n/mH*100)}%"></div></div><div class="bar-val">${n}</div></div>`).join('')||'<div style="color:var(--text3);font-size:12px">Sem dados</div>';
+  }
+
   // Especialidades
   const eC={};dadosPlantoes.forEach(p=>{eC[p.setor]=(eC[p.setor]||0)+1;});
   const eA=Object.entries(eC).sort((a,b)=>b[1]-a[1]).slice(0,8);
   const mE=eA[0]?.[1]||1;
-  document.getElementById('chart-esp').innerHTML=eA.map(([e,n])=>`<div class="bar-row"><div class="bar-lbl" title="${e}">${e}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(n/mE*100)}%;background:linear-gradient(90deg,#0891B2,#22D3EE)"></div></div><div class="bar-val">${n}</div></div>`).join('')||'<div style="color:var(--text3);font-size:12px">Sem dados</div>';
+  const elChartEsp = document.getElementById('chart-esp');
+  if(elChartEsp){
+    elChartEsp.innerHTML=eA.map(([e,n])=>`<div class="bar-row"><div class="bar-lbl" title="${e}">${e}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(n/mE*100)}%;background:linear-gradient(90deg,#0891B2,#22D3EE)"></div></div><div class="bar-val">${n}</div></div>`).join('')||'<div style="color:var(--text3);font-size:12px">Sem dados</div>';
+  }
 }
 
 // ── TABELAS ───────────────────────────────────────────────────
@@ -164,37 +173,52 @@ function pBar(pct,st){const c=st==='ok'?'var(--greenl)':st==='and'?'var(--gold)'
 
 function renderTabelaAlunos(lista){
   lista=lista||resumoAlunos;
-  document.getElementById('tbl-count').textContent=lista.length+' alunos';
+  const elCount = document.getElementById('tbl-count');
+  if(elCount) elCount.textContent=lista.length+' alunos';
   const tbody=document.getElementById('tbody-alunos');
+  if(!tbody) return;
   if(!lista.length){tbody.innerHTML=`<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-txt">Nenhum aluno encontrado</div></div></td></tr>`;return;}
   tbody.innerHTML=lista.map(a=>{const u=a.ultimo;return`<tr><td class="td-nome">${a.nome}</td><td class="td-ra">${a.ra}</td><td>${pChip(a.periodo)}</td><td>${pBar(a.pct,a.status)}<div style="font-size:11px;color:var(--text3);margin-top:2px">${a.plantoes}/${TOTAL_PLANTOES}</div></td><td style="font-size:12px;color:var(--text2)">${u?u.hospital:'—'}</td><td style="font-size:12px;color:var(--text2)">${u?u.setor:'—'}</td><td style="font-size:12px;color:var(--text2)">${u?u.preceptor:'—'}</td><td>${stChip(a.status)}</td></tr>`;}).join('');
 }
-window.renderTabelaAlunos=renderTabelaAlunos;
 
 function renderTabelaPlantoes(lista){
   lista=lista||dadosPlantoes;
-  document.getElementById('plt-count').textContent=lista.length+' registros';
+  const elCount = document.getElementById('plt-count');
+  if(elCount) elCount.textContent=lista.length+' registros';
   const tbody=document.getElementById('tbody-plt');
+  if(!tbody) return;
   if(!lista.length){tbody.innerHTML=`<tr><td colspan="9"><div class="empty-state"><div class="empty-icon">📋</div><div class="empty-txt">Nenhum plantão encontrado</div></div></td></tr>`;return;}
   tbody.innerHTML=[...lista].reverse().map(p=>`<tr><td class="td-ra">${p.id?.substring(0,8)||'—'}</td><td style="font-size:12px;color:var(--text2);white-space:nowrap">${p.dataHora||p.data||'—'}</td><td class="td-nome">${p.nome}</td><td class="td-ra">${p.ra}</td><td>${pChip(p.periodo)}</td><td style="font-size:12px">${p.hospital||'—'}</td><td style="font-size:12px;color:var(--text2)">${p.setor||'—'}</td><td style="font-size:12px;color:var(--text2)">${p.preceptor||'—'}</td><td><span class="chip chip-green">✓ OK</span></td></tr>`).join('');
 }
-window.renderTabelaPlantoes=renderTabelaPlantoes;
 
 function renderAlertas(){
   const atrasados=resumoAlunos.filter(a=>a.status==='atr');
   const concluidos=resumoAlunos.filter(a=>a.status==='ok');
   const zero=resumoAlunos.filter(a=>a.plantoes===0);
-  document.getElementById('cnt-atr').textContent=atrasados.length;
-  document.getElementById('cnt-ok').textContent=concluidos.length;
-  document.getElementById('cnt-zero').textContent=zero.length;
+  
+  const elCntAtr = document.getElementById('cnt-atr');
+  if(elCntAtr) elCntAtr.textContent=atrasados.length;
+  
+  const elCntOk = document.getElementById('cnt-ok');
+  if(elCntOk) elCntOk.textContent=concluidos.length;
+  
+  const elCntZero = document.getElementById('cnt-zero');
+  if(elCntZero) elCntZero.textContent=zero.length;
+
   function item(a,tipo){
     const icon=tipo==='ok'?'🎉':tipo==='zero'?'❗':'⚠️', cls=tipo==='ok'?'ok':tipo==='zero'?'err':'warn';
     const msg=tipo==='ok'?'Completou todos os 20 plantões!':tipo==='zero'?'Ainda não registrou nenhum plantão':`${a.plantoes}/${TOTAL_PLANTOES} plantões — ${a.pct}% concluído`;
     return`<div class="alerta-item"><div class="alerta-icon ${cls}">${icon}</div><div><div class="alerta-nome">${a.nome} <span style="font-size:11px;color:var(--text3)">${a.ra}</span></div><div class="alerta-msg">${a.periodo} · ${msg}</div></div></div>`;
   }
-  document.getElementById('list-atrasados').innerHTML=atrasados.length?atrasados.map(a=>item(a,'atr')).join(''):'<div class="empty-state"><div class="empty-icon">✅</div><div class="empty-txt">Nenhum aluno atrasado!</div></div>';
-  document.getElementById('list-concluidos').innerHTML=concluidos.length?concluidos.map(a=>item(a,'ok')).join(''):'<div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-txt">Nenhum aluno concluiu ainda</div></div>';
-  document.getElementById('list-zero').innerHTML=zero.length?zero.map(a=>item(a,'zero')).join(''):'<div style="padding:16px 0;color:var(--text2);font-size:13px">✅ Todos os alunos já realizaram ao menos um plantão.</div>';
+  
+  const elListAtr = document.getElementById('list-atrasados');
+  if(elListAtr) elListAtr.innerHTML=atrasados.length?atrasados.map(a=>item(a,'atr')).join(''):'<div class="empty-state"><div class="empty-icon">✅</div><div class="empty-txt">Nenhum aluno atrasado!</div></div>';
+  
+  const elListOk = document.getElementById('list-concluidos');
+  if(elListOk) elListOk.innerHTML=concluidos.length?concluidos.map(a=>item(a,'ok')).join(''):'<div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-txt">Nenhum aluno concluiu ainda</div></div>';
+  
+  const elListZero = document.getElementById('list-zero');
+  if(elListZero) elListZero.innerHTML=zero.length?zero.map(a=>item(a,'zero')).join(''):'<div style="padding:16px 0;color:var(--text2);font-size:13px">✅ Todos os alunos já realizaram ao menos um plantão.</div>';
 }
 
 // ── FILTROS ───────────────────────────────────────────────────
@@ -216,16 +240,14 @@ function filtrarPlantoes(){
   if(h) l=l.filter(p=>p.hospital===h);
   renderTabelaPlantoes(l);
 }
-window.filtrarTabela=filtrarTabela; window.filtrarPlantoes=filtrarPlantoes;
 
 function sortBy(col){
   if(sortCol===col) sortAsc=!sortAsc; else{sortCol=col;sortAsc=true;}
   const sorted=[...resumoAlunos].sort((a,b)=>{let va=a[col]||0,vb=b[col]||0;if(typeof va==='string') return sortAsc?va.localeCompare(vb):vb.localeCompare(va);return sortAsc?va-vb:vb-va;});
   renderTabelaAlunos(sorted);
 }
-window.sortBy=sortBy;
 
-// ── CADASTRAR ALUNO (nova função) ─────────────────────────────
+// ── CADASTRAR ALUNO ───────────────────────────────────────────
 async function salvarAluno(){
   const ra=document.getElementById('cad-ra').value.trim();
   const nome=document.getElementById('cad-nome').value.trim();
@@ -233,28 +255,36 @@ async function salvarAluno(){
   const turma=document.getElementById('cad-turma').value.trim();
   const email=document.getElementById('cad-email').value.trim();
   if(!ra||!nome||!periodo){toast('RA, nome e período são obrigatórios','err');return;}
-  const btn=document.getElementById('btn-salvar-aluno'); btn.disabled=true;
+  const btn=document.getElementById('btn-salvar-aluno'); if(btn) btn.disabled=true;
   try {
-    // Verificar se RA já existe
     const q=query(collection(db,'alunos'),where('ra','==',ra));
     const s=await getDocs(q);
-    if(!s.empty){toast('RA '+ra+' já cadastrado!','err');btn.disabled=false;return;}
+    if(!s.empty){toast('RA '+ra+' já cadastrado!','err'); if(btn) btn.disabled=false; return;}
     await addDoc(collection(db,'alunos'),{ra,nome,periodo,turma,email,status:'Ativo',criadoEm:Timestamp.now()});
     toast('Aluno '+nome+' cadastrado!','ok');
     document.getElementById('cad-ra').value=''; document.getElementById('cad-nome').value='';
     document.getElementById('cad-turma').value=''; document.getElementById('cad-email').value='';
     carregarDados();
   } catch(e){toast('Erro ao cadastrar. Tente novamente.','err');console.error(e);}
-  btn.disabled=false;
+  if(btn) btn.disabled=false;
 }
-window.salvarAluno=salvarAluno;
 
 function exportarPDF(){toast('Preparando PDF...','ok');setTimeout(()=>window.print(),300);}
-window.exportarPDF=exportarPDF;
 
 let _tTO;
-function toast(msg,tipo='ok'){const el=document.getElementById('toast');el.textContent=msg;el.className='toast '+tipo+' show';clearTimeout(_tTO);_tTO=setTimeout(()=>el.classList.remove('show'),3000);}
-window.toast=toast;
+function toast(msg,tipo='ok'){const el=document.getElementById('toast'); if(!el) return; el.textContent=msg;el.className='toast '+tipo+' show';clearTimeout(_tTO);_tTO=setTimeout(()=>el.classList.remove('show'),3000);}
+
+// ── EVENTOS E EXPORTAÇÃO GLOBAL (CORREÇÃO PARA GITHUB) ───────────
+window.entrar = entrar;
+window.sair = sair;
+window.navTo = navTo;
+window.salvarAluno = salvarAluno;
+window.filtrarTabela = filtrarTabela;
+window.filtrarPlantoes = filtrarPlantoes;
+window.sortBy = sortBy;
+window.exportarPDF = exportarPDF;
+window.toast = toast;
+window.carregarDados = carregarDados;
 
 document.getElementById('login-senha').addEventListener('keydown',e=>{if(e.key==='Enter') entrar();});
 </script>
@@ -378,7 +408,6 @@ tbody tr:hover{background:rgba(74,168,90,.04)}tbody td{padding:12px 14px;color:v
 </style>
 </head>
 <body>
-<!-- LOGIN -->
 <div id="screen-login" class="screen on">
   <div class="login-box">
     <div class="login-logo">
@@ -396,7 +425,6 @@ tbody tr:hover{background:rgba(74,168,90,.04)}tbody td{padding:12px 14px;color:v
   </div>
 </div>
 
-<!-- DASHBOARD -->
 <div id="screen-dash" class="screen">
 <div class="layout">
   <aside class="sidebar">
@@ -409,129 +437,216 @@ tbody tr:hover{background:rgba(74,168,90,.04)}tbody td{padding:12px 14px;color:v
       <div class="nav-item active" onclick="navTo('p-overview',this)"><span class="nav-icon">📊</span> Visão Geral</div>
       <div class="nav-item" onclick="navTo('p-alunos',this)"><span class="nav-icon">👨‍⚕️</span> Alunos</div>
       <div class="nav-item" onclick="navTo('p-plantoes',this)"><span class="nav-icon">📋</span> Plantões</div>
-      <div class="nav-item" onclick="navTo('p-alertas',this)"><span class="nav-icon">🔔</span> Alertas<span id="badge-alerta" style="margin-left:auto;background:rgba(224,85,85,.2);color:var(--red);font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;display:none"></span></div>
-      <div class="nav-item" onclick="navTo('p-cadastro',this)"><span class="nav-icon">➕</span> Cadastrar Aluno</div>
+      <div class="nav-item" onclick="navTo('p-alertas',this)"><span class="nav-icon">⚠️</span> Alertas <span class="kpi-badge badge-warn" id="badge-alerta" style="display:none;position:static;margin-left:auto">0</span></div>
       <div class="nav-sep"></div>
-      <div class="nav-item" onclick="exportarPDF()"><span class="nav-icon">📄</span> Exportar PDF</div>
-      <div class="nav-item" onclick="carregarDados()"><span class="nav-icon">🔄</span> Atualizar dados</div>
+      <div class="nav-item" onclick="navTo('p-cad',this)"><span class="nav-icon">➕</span> Novo Aluno</div>
     </nav>
     <div class="sidebar-footer">
-      <div class="sidebar-user" id="sb-data">—</div>
-      <button class="btn-sair" onclick="sair()">← Sair</button>
+      <div class="sidebar-user">Logado como Coordenação</div>
+      <button class="btn-sair" onclick="sair()">Encerrar Sessão</button>
     </div>
   </aside>
 
   <main class="main">
-    <!-- VISÃO GERAL -->
-    <div class="page on" id="p-overview">
+    <div id="sb-data" style="font-family:var(--font-m);font-size:11px;color:var(--text3);margin-bottom:20px;text-transform:uppercase;letter-spacing:1px"></div>
+
+    <div id="p-overview" class="page on">
       <div class="topbar-main">
-        <div><div class="page-title">Visão Geral</div><div class="page-sub" id="ov-sub">Carregando...</div></div>
+        <div>
+          <h1 class="page-title">Dashboard</h1>
+          <p class="page-sub" id="ov-sub">Carregando informações do semestre...</p>
+        </div>
         <div class="topbar-actions">
           <button class="btn btn-ghost" onclick="carregarDados()">🔄 Atualizar</button>
-          <button class="btn btn-primary" onclick="exportarPDF()">📄 PDF</button>
+          <button class="btn btn-primary" onclick="exportarPDF()">📄 Relatório PDF</button>
         </div>
       </div>
+
       <div class="kpi-grid">
-        <div class="kpi-card" style="--kpi-color:var(--green)"><span class="kpi-icon">👨‍⚕️</span><div class="kpi-val" id="kpi-alunos">—</div><div class="kpi-lbl">Alunos ativos</div></div>
-        <div class="kpi-card" style="--kpi-color:#7CB8F0"><span class="kpi-icon">✅</span><div class="kpi-val" id="kpi-plantoes">—</div><div class="kpi-lbl">Plantões registrados</div><span class="kpi-badge badge-info" id="kpi-hoje">hoje: —</span></div>
-        <div class="kpi-card" style="--kpi-color:var(--gold)"><span class="kpi-icon">📈</span><div class="kpi-val" id="kpi-media">—</div><div class="kpi-lbl">Média por aluno</div><span class="kpi-badge badge-ok">/20</span></div>
-        <div class="kpi-card" style="--kpi-color:var(--red)"><span class="kpi-icon">⚠️</span><div class="kpi-val" id="kpi-atrasados">—</div><div class="kpi-lbl">Alunos atrasados</div><span class="kpi-badge badge-warn">< 50%</span></div>
+        <div class="kpi-card" style="--kpi-color:var(--green)">
+          <span class="kpi-icon">👨‍⚕️</span>
+          <div class="kpi-val" id="kpi-alunos">0</div>
+          <div class="kpi-lbl">Total de Alunos</div>
+        </div>
+        <div class="kpi-card" style="--kpi-color:var(--greenl)">
+          <span class="kpi-icon">📋</span>
+          <div class="kpi-val" id="kpi-plantoes">0</div>
+          <div class="kpi-lbl">Total de Plantões</div>
+          <div class="kpi-badge badge-ok" id="kpi-hoje">hoje: 0</div>
+        </div>
+        <div class="kpi-card" style="--kpi-color:var(--accent)">
+          <span class="kpi-icon">📈</span>
+          <div class="kpi-val" id="kpi-media">0</div>
+          <div class="kpi-lbl">Média / Aluno</div>
+        </div>
+        <div class="kpi-card" style="--kpi-color:var(--red)">
+          <span class="kpi-icon">⚠️</span>
+          <div class="kpi-val" id="kpi-atrasados">0</div>
+          <div class="kpi-lbl">Alunos Atrasados</div>
+        </div>
       </div>
+
       <div class="grid-3">
         <div class="card">
-          <div class="card-head"><div class="card-title">🏆 Progresso dos Alunos</div><span style="font-size:11px;color:var(--text3)" id="prog-count">—</span></div>
-          <div class="card-body" style="padding-top:8px"><div id="prog-list"><div style="text-align:center;padding:40px;color:var(--text2)">Carregando...</div></div></div>
+          <div class="card-head"><div class="card-title">🏆 Ranking de Progresso (Top 10)</div><div class="sidebar-sem" id="prog-count">0 alunos</div></div>
+          <div class="card-body">
+            <div id="prog-list"></div>
+          </div>
         </div>
-        <div style="display:flex;flex-direction:column;gap:20px">
-          <div class="card">
-            <div class="card-head"><div class="card-title">📊 Conclusão Geral</div></div>
-            <div class="card-body" style="display:flex;align-items:center;justify-content:center;padding:24px">
-              <div class="donut-wrap">
-                <div class="donut">
-                  <svg width="120" height="120" viewBox="0 0 120 120"><circle class="donut-bg" cx="60" cy="60" r="50"/><circle class="donut-fg" id="donut-fg" cx="60" cy="60" r="50" stroke="url(#dg)" stroke-dasharray="314" stroke-dashoffset="314"/><defs><linearGradient id="dg" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#2D7A3A"/><stop offset="100%" stop-color="#6FCF80"/></linearGradient></defs></svg>
-                  <div class="donut-center"><div class="donut-pct" id="donut-pct">0%</div><div class="donut-sub">concluído</div></div>
-                </div>
-                <div class="donut-legend">
-                  <div class="legend-item"><div class="legend-dot" style="background:var(--greenl)"></div><span id="leg-ok">—</span></div>
-                  <div class="legend-item"><div class="legend-dot" style="background:var(--orange)"></div><span id="leg-and">—</span></div>
-                  <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div><span id="leg-at">—</span></div>
+        <div class="card">
+          <div class="card-head"><div class="card-title">📊 Status do Semestre</div></div>
+          <div class="card-body" style="padding:30px 22px">
+            <div class="donut-wrap">
+              <div class="donut">
+                <svg width="120" height="120">
+                  <circle class="donut-bg" cx="60" cy="60" r="50"></circle>
+                  <circle id="donut-fg" class="donut-fg" cx="60" cy="60" r="50" style="stroke:var(--greenl);stroke-dasharray:314;stroke-dashoffset:314"></circle>
+                </svg>
+                <div class="donut-center">
+                  <div class="donut-pct" id="donut-pct">0%</div>
+                  <div class="donut-sub">Global</div>
                 </div>
               </div>
+              <div class="donut-legend">
+                <div class="legend-item"><div class="legend-dot" style="background:var(--greenl)"></div><span id="leg-ok">0 completos</span></div>
+                <div class="legend-item"><div class="legend-dot" style="background:var(--gold)"></div><span id="leg-and">0 em andamento</span></div>
+                <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div><span id="leg-at">0 atrasados</span></div>
+              </div>
+            </div>
+            <div style="margin-top:28px;padding-top:20px;border-top:1px solid var(--border2)">
+              <div class="card-title" style="font-size:12px;margin-bottom:15px;color:var(--text2)">Hospitais mais ativos</div>
+              <div id="chart-hosp" class="bar-chart"></div>
             </div>
           </div>
-          <div class="card">
-            <div class="card-head"><div class="card-title">🏥 Top Hospitais</div></div>
-            <div class="card-body" style="padding-top:12px"><div class="bar-chart" id="chart-hosp"></div></div>
-          </div>
         </div>
       </div>
-      <div class="card">
-        <div class="card-head"><div class="card-title">🩺 Plantões por Especialidade</div></div>
-        <div class="card-body" style="padding-top:12px"><div class="bar-chart" id="chart-esp" style="max-width:600px"></div></div>
-      </div>
-    </div>
 
-    <!-- ALUNOS -->
-    <div class="page" id="p-alunos">
-      <div class="topbar-main"><div><div class="page-title">Alunos</div><div class="page-sub">Tabela completa com progresso</div></div><div class="topbar-actions"><button class="btn btn-primary" onclick="exportarPDF()">📄 PDF</button></div></div>
       <div class="card">
-        <div class="card-head"><div class="card-title">👨‍⚕️ Todos os Alunos</div><span style="font-size:11px;color:var(--text3)" id="tbl-count">—</span></div>
+        <div class="card-head"><div class="card-title">🏥 Distribuição por Especialidade</div></div>
         <div class="card-body">
-          <div class="search-bar">
-            <input class="search-input" type="text" id="busca-aluno" placeholder="🔍  Buscar por nome ou RA..." oninput="filtrarTabela()">
-            <select class="filter-select" id="filtro-periodo" onchange="filtrarTabela()"><option value="">Todos os períodos</option><option>5º Período</option><option>6º Período</option><option>7º Período</option><option>8º Período</option><option>9º Período</option><option>10º Período</option><option>11º Período</option><option>12º Período</option></select>
-            <select class="filter-select" id="filtro-status" onchange="filtrarTabela()"><option value="">Todos os status</option><option value="ok">Concluídos</option><option value="and">Em andamento</option><option value="atr">Atrasados</option></select>
-          </div>
-          <div class="tbl-wrap"><table id="tbl-alunos"><thead><tr><th onclick="sortBy('nome')">Aluno <span class="sort-icon">↕</span></th><th onclick="sortBy('ra')">Matrícula <span class="sort-icon">↕</span></th><th>Período</th><th onclick="sortBy('plantoes')">Progresso <span class="sort-icon">↕</span></th><th>Último hospital</th><th>Especialidade</th><th>Preceptor</th><th>Status</th></tr></thead><tbody id="tbody-alunos"><tr><td colspan="8" style="text-align:center;padding:40px;color:var(--text2)">Carregando...</td></tr></tbody></table></div>
+          <div id="chart-esp" class="bar-chart" style="display:grid;grid-template-columns:1fr 1fr;gap:x 40px"></div>
         </div>
       </div>
     </div>
 
-    <!-- PLANTÕES -->
-    <div class="page" id="p-plantoes">
-      <div class="topbar-main"><div><div class="page-title">Plantões</div><div class="page-sub">Registro completo de presenças</div></div><div class="topbar-actions"><button class="btn btn-primary" onclick="exportarPDF()">📄 PDF</button></div></div>
+    <div id="p-alunos" class="page">
+      <div class="topbar-main">
+        <div><h1 class="page-title">Corpo Discente</h1><p class="page-sub" id="tbl-count">0 alunos cadastrados</p></div>
+      </div>
+      <div class="search-bar">
+        <input type="text" class="search-input" id="busca-aluno" placeholder="Buscar por nome ou RA..." oninput="filtrarTabela()">
+        <select class="filter-select" id="filtro-periodo" onchange="filtrarTabela()">
+          <option value="">Todos os Períodos</option>
+          <option>5º Período</option><option>6º Período</option><option>7º Período</option><option>8º Período</option><option>9º Período</option><option>10º Período</option><option>11º Período</option><option>12º Período</option>
+        </select>
+        <select class="filter-select" id="filtro-status" onchange="filtrarTabela()">
+          <option value="">Todos os Status</option>
+          <option value="ok">Concluídos</option><option value="and">Em andamento</option><option value="atr">Atrasados</option>
+        </select>
+      </div>
       <div class="card">
-        <div class="card-head"><div class="card-title">📋 Todos os Registros</div><span style="font-size:11px;color:var(--text3)" id="plt-count">—</span></div>
-        <div class="card-body">
-          <div class="search-bar">
-            <input class="search-input" type="text" id="busca-plt" placeholder="🔍  Buscar aluno, hospital ou especialidade..." oninput="filtrarPlantoes()">
-            <select class="filter-select" id="filtro-hosp" onchange="filtrarPlantoes()"><option value="">Todos os hospitais</option><option>Hospital de Guarus</option><option>Hospital Ferreira Machado</option><option>Santa Casa de Misericórdia</option><option>Hospital Plantadores de Cana</option><option>Hospital São José</option><option>UBS Farol</option><option>Beneficência Portuguesa</option><option>Hospital Álvaro Alvim</option><option>UPA 24 Horas</option></select>
-          </div>
-          <div class="tbl-wrap"><table><thead><tr><th>ID</th><th>Data/Hora</th><th>Aluno</th><th>Matrícula</th><th>Período</th><th>Hospital</th><th>Especialidade</th><th>Preceptor</th><th>Status</th></tr></thead><tbody id="tbody-plt"><tr><td colspan="9" style="text-align:center;padding:40px;color:var(--text2)">Carregando...</td></tr></tbody></table></div>
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th onclick="sortBy('nome')">Nome <span class="sort-icon">⇅</span></th>
+                <th onclick="sortBy('ra')">RA <span class="sort-icon">⇅</span></th>
+                <th onclick="sortBy('periodo')">Período <span class="sort-icon">⇅</span></th>
+                <th onclick="sortBy('pct')">Progresso <span class="sort-icon">⇅</span></th>
+                <th>Últ. Hospital</th>
+                <th>Últ. Setor</th>
+                <th>Últ. Preceptor</th>
+                <th onclick="sortBy('status')">Status <span class="sort-icon">⇅</span></th>
+              </tr>
+            </thead>
+            <tbody id="tbody-alunos"></tbody>
+          </table>
         </div>
       </div>
     </div>
 
-    <!-- ALERTAS -->
-    <div class="page" id="p-alertas">
-      <div class="topbar-main"><div><div class="page-title">Alertas</div><div class="page-sub">Alunos que precisam de atenção</div></div></div>
+    <div id="p-plantoes" class="page">
+      <div class="topbar-main">
+        <div><h1 class="page-title">Histórico de Plantões</h1><p class="page-sub" id="plt-count">0 registros confirmados</p></div>
+      </div>
+      <div class="search-bar">
+        <input type="text" class="search-input" id="busca-plt" placeholder="Busca rápida..." oninput="filtrarPlantoes()">
+        <select class="filter-select" id="filtro-hosp" onchange="filtrarPlantoes()">
+          <option value="">Todos os Hospitais</option>
+          <option>HPSC</option><option>HECC</option><option>HMM</option><option>HAA</option><option>UBS</option><option>HGE</option>
+        </select>
+      </div>
+      <div class="card">
+        <div class="tbl-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Data/Hora</th>
+                <th>Aluno</th>
+                <th>RA</th>
+                <th>Período</th>
+                <th>Hospital</th>
+                <th>Setor/Espec.</th>
+                <th>Preceptor</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="tbody-plt"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="p-alertas" class="page">
+      <div class="topbar-main">
+        <div><h1 class="page-title">Centro de Alertas</h1><p class="page-sub">Identificação automática de irregularidades e marcos</p></div>
+      </div>
+      <div class="grid-3" style="grid-template-columns: 1fr 1fr 1fr; gap:16px;margin-bottom:24px">
+        <div class="kpi-card" style="padding:16px;--kpi-color:var(--red)"><div class="kpi-val" style="font-size:24px" id="cnt-atr">0</div><div class="kpi-lbl">Atrasados (>50%)</div></div>
+        <div class="kpi-card" style="padding:16px;--kpi-color:var(--green)"><div class="kpi-val" style="font-size:24px" id="cnt-ok">0</div><div class="kpi-lbl">Concluídos (100%)</div></div>
+        <div class="kpi-card" style="padding:16px;--kpi-color:var(--orange)"><div class="kpi-val" style="font-size:24px" id="cnt-zero">0</div><div class="kpi-lbl">Inativos (Zero)</div></div>
+      </div>
       <div class="grid-2">
-        <div class="card"><div class="card-head"><div class="card-title">🚨 Atrasados (&lt; 50%)</div><span class="chip chip-red" id="cnt-atr">—</span></div><div class="card-body" style="padding-top:6px"><div id="list-atrasados"></div></div></div>
-        <div class="card"><div class="card-head"><div class="card-title">🎉 Concluídos (20/20)</div><span class="chip chip-green" id="cnt-ok">—</span></div><div class="card-body" style="padding-top:6px"><div id="list-concluidos"></div></div></div>
+        <div class="card">
+          <div class="card-head"><div class="card-title">🚨 Crítico: Alunos com Baixo Desempenho</div></div>
+          <div class="card-body" id="list-atrasados"></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><div class="card-title">🎉 Sucesso: Alunos Concluídos</div></div>
+          <div class="card-body" id="list-concluidos"></div>
+        </div>
       </div>
-      <div class="card"><div class="card-head"><div class="card-title">⏳ Sem nenhum plantão ainda</div><span class="chip chip-orange" id="cnt-zero">—</span></div><div class="card-body" style="padding-top:6px"><div id="list-zero"></div></div></div>
+      <div class="card">
+        <div class="card-head"><div class="card-title">❗ Atenção: Alunos sem nenhum registro</div></div>
+        <div class="card-body" id="list-zero"></div>
+      </div>
     </div>
 
-    <!-- CADASTRAR ALUNO -->
-    <div class="page" id="p-cadastro">
-      <div class="topbar-main"><div><div class="page-title">Cadastrar Aluno</div><div class="page-sub">Adicionar novo aluno ao sistema Firebase</div></div></div>
-      <div class="card" style="max-width:640px">
-        <div class="card-head"><div class="card-title">➕ Novo Aluno</div></div>
+    <div id="p-cad" class="page">
+      <div class="topbar-main">
+        <div><h1 class="page-title">Gestão de Alunos</h1><p class="page-sub">Cadastrar novo estudante na base de dados</p></div>
+      </div>
+      <div class="card" style="max-width:700px">
+        <div class="card-head"><div class="card-title">📝 Formulário de Registro</div></div>
         <div class="card-body">
           <div class="form-cad">
-            <div class="fg-d"><label>Matrícula (RA) *</label><input type="text" id="cad-ra" placeholder="Ex: 2022001" inputmode="numeric"></div>
-            <div class="fg-d"><label>Período *</label>
-              <select id="cad-periodo"><option value="">Selecionar...</option><option>5º Período</option><option>6º Período</option><option>7º Período</option><option>8º Período</option><option>9º Período</option><option>10º Período</option><option>11º Período</option><option>12º Período</option></select>
+            <div class="fg-d"><label>RA (Registro Acadêmico)</label><input type="text" id="cad-ra" placeholder="Ex: 221011"></div>
+            <div class="fg-d"><label>Nome Completo</label><input type="text" id="cad-nome" placeholder="Ex: Carlos Augusto"></div>
+            <div class="fg-d"><label>Período Atual</label>
+              <select id="cad-periodo">
+                <option>5º Período</option><option>6º Período</option><option>7º Período</option><option>8º Período</option>
+                <option>9º Período</option><option>10º Período</option><option>11º Período</option><option>12º Período</option>
+              </select>
             </div>
-            <div class="fg-d" style="grid-column:1/-1"><label>Nome Completo *</label><input type="text" id="cad-nome" placeholder="Nome como consta na matrícula"></div>
-            <div class="fg-d"><label>Turma</label><input type="text" id="cad-turma" placeholder="Ex: A, B, Manhã, Tarde"></div>
+            <div class="fg-d"><label>Turma / Grupo</label><input type="text" id="cad-turma" placeholder="Ex: A, B, Manhã, Tarde"></div>
             <div class="fg-d"><label>E-mail</label><input type="email" id="cad-email" placeholder="aluno@fmc.edu.br"></div>
           </div>
           <div style="margin-top:20px">
             <button class="btn btn-primary" id="btn-salvar-aluno" onclick="salvarAluno()" style="width:auto;padding:12px 28px">✅ Cadastrar Aluno</button>
           </div>
           <div style="margin-top:16px;padding:14px;background:rgba(74,168,90,.06);border:1px solid var(--border);border-radius:10px;font-size:12px;color:var(--text2);line-height:1.7">
-            💡 <strong style="color:var(--text)">Como funciona:</strong> O aluno cadastrado aqui poderá fazer login no app com o RA e nome exatamente como foi inserido (aceitando variações de até ~55% de similaridade no nome). O campo "status" é definido como "Ativo" automaticamente.
+            💡 <strong style="color:var(--text)">Como funciona:</strong> O aluno cadastrado aqui poderá fazer login no app com o RA e nome exatamente como foi inserido. O campo "status" é definido como "Ativo" automaticamente.
           </div>
         </div>
       </div>
@@ -540,14 +655,15 @@ tbody tr:hover{background:rgba(74,168,90,.04)}tbody td{padding:12px 14px;color:v
 </div>
 </div>
 
-
 <nav class="mobile-nav">
   <div class="mnav-item active" onclick="navTo('p-overview',this)">📊<span>Geral</span></div>
   <div class="mnav-item" onclick="navTo('p-alunos',this)">👨‍⚕️<span>Alunos</span></div>
   <div class="mnav-item" onclick="navTo('p-plantoes',this)">📋<span>Plantões</span></div>
-  <div class="mnav-item" onclick="navTo('p-alertas',this)">🔔<span>Alertas</span></div>
-  <div class="mnav-item" onclick="navTo('p-cadastro',this)">➕<span>Cadastrar</span></div>
+  <div class="mnav-item" onclick="navTo('p-alertas',this)">⚠️<span>Alertas</span></div>
+  <div class="mnav-item" onclick="navTo('p-cad',this)">➕<span>Novo</span></div>
 </nav>
-<div class="toast" id="toast"></div>
+
+<div id="toast" class="toast"></div>
+
 </body>
 </html>
