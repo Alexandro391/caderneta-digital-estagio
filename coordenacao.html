@@ -12,7 +12,7 @@ import { getFirestore, collection, getDocs, addDoc,
          query, where, orderBy, onSnapshot, Timestamp }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const FB = { apiKey:"AIzaSyDmvQBpa27aVekvu8YqE47xA6GV48-kLgY", authDomain:"caderneta-fmc.firebaseapp.com",
+const FB = { apiKey:"AIzaSyCTpK-m1xjzs27MJ0827GRpBrUaih_4wSg", authDomain:"caderneta-fmc.firebaseapp.com",
              projectId:"caderneta-fmc", storageBucket:"caderneta-fmc.firebasestorage.app",
              messagingSenderId:"739844114033", appId:"1:739844114033:web:bcc7234c924d0b13217dd0" };
 const app = initializeApp(FB);
@@ -327,6 +327,21 @@ tbody tr:hover{background:rgba(74,168,90,.04)}tbody td{padding:12px 14px;color:v
 .empty-state{text-align:center;padding:48px 20px}.empty-icon{font-size:40px;margin-bottom:12px}.empty-txt{font-size:14px;color:var(--text2)}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);padding:12px 22px;border-radius:99px;font-size:13px;font-weight:600;z-index:999;transition:transform .35s cubic-bezier(.34,1.56,.64,1);white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,.5)}
 .toast.show{transform:translateX(-50%) translateY(0)}.toast.ok{background:var(--green);color:white}.toast.err{background:var(--red);color:white}
+
+/* MOBILE NAV */
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--border);z-index:100;padding:8px 0 14px;}
+.mnav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:19px;color:var(--text2);cursor:pointer;padding:4px 2px;font-family:var(--font-b);font-weight:600;}
+.mnav-item span{font-size:9.5px;color:var(--text2);}
+.mnav-item.active span{color:var(--greenl);}
+@media(max-width:900px){
+  .mobile-nav{display:flex;}
+  .sidebar{display:none!important;}
+  .main{padding:16px 14px 90px;}
+  .page-title{font-size:22px;}
+  .kpi-grid{grid-template-columns:repeat(2,1fr);gap:10px;}
+  .grid-2,.grid-3{grid-template-columns:1fr;}
+}
+
 @media print{.sidebar,.topbar-actions,.search-bar,.btn,#screen-login{display:none!important}.layout{grid-template-columns:1fr}.main{padding:0}.card{border:1px solid #ccc;break-inside:avoid}body{background:white;color:black}.page{display:block!important}}
 @media(max-width:900px){.layout{grid-template-columns:1fr}.sidebar{display:none}.kpi-grid{grid-template-columns:repeat(2,1fr)}.grid-2,.grid-3{grid-template-columns:1fr}}
 </style>
@@ -494,6 +509,14 @@ tbody tr:hover{background:rgba(74,168,90,.04)}tbody td{padding:12px 14px;color:v
 </div>
 </div>
 
+
+<nav class="mobile-nav">
+  <div class="mnav-item active" onclick="navTo('p-overview',this)">📊<span>Geral</span></div>
+  <div class="mnav-item" onclick="navTo('p-alunos',this)">👨‍⚕️<span>Alunos</span></div>
+  <div class="mnav-item" onclick="navTo('p-plantoes',this)">📋<span>Plantões</span></div>
+  <div class="mnav-item" onclick="navTo('p-alertas',this)">🔔<span>Alertas</span></div>
+  <div class="mnav-item" onclick="navTo('p-cadastro',this)">➕<span>Cadastrar</span></div>
+</nav>
 <div class="toast" id="toast"></div>
 </body>
 </html>
