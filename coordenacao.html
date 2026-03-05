@@ -249,21 +249,32 @@ function sortBy(col){
 
 // ── CADASTRAR ALUNO ───────────────────────────────────────────
 async function salvarAluno(){
-  const ra=document.getElementById('cad-ra').value.trim();
   const nome=document.getElementById('cad-nome').value.trim();
+  const ra=document.getElementById('cad-ra').value.trim();
   const periodo=document.getElementById('cad-periodo').value;
-  const turma=document.getElementById('cad-turma').value.trim();
   const email=document.getElementById('cad-email').value.trim();
-  if(!ra||!nome||!periodo){toast('RA, nome e período são obrigatórios','err');return;}
+  
+  if(!ra||!nome||!periodo){toast('Nome, RA e período são obrigatórios','err');return;}
+  
   const btn=document.getElementById('btn-salvar-aluno'); if(btn) btn.disabled=true;
   try {
     const q=query(collection(db,'alunos'),where('ra','==',ra));
     const s=await getDocs(q);
     if(!s.empty){toast('RA '+ra+' já cadastrado!','err'); if(btn) btn.disabled=false; return;}
-    await addDoc(collection(db,'alunos'),{ra,nome,periodo,turma,email,status:'Ativo',criadoEm:Timestamp.now()});
+    
+    await addDoc(collection(db,'alunos'),{
+      ra,
+      nome,
+      periodo,
+      email,
+      status:'Ativo',
+      criadoEm:Timestamp.now()
+    });
+    
     toast('Aluno '+nome+' cadastrado!','ok');
-    document.getElementById('cad-ra').value=''; document.getElementById('cad-nome').value='';
-    document.getElementById('cad-turma').value=''; document.getElementById('cad-email').value='';
+    document.getElementById('cad-nome').value='';
+    document.getElementById('cad-ra').value='';
+    document.getElementById('cad-email').value='';
     carregarDados();
   } catch(e){toast('Erro ao cadastrar. Tente novamente.','err');console.error(e);}
   if(btn) btn.disabled=false;
@@ -274,7 +285,7 @@ function exportarPDF(){toast('Preparando PDF...','ok');setTimeout(()=>window.pri
 let _tTO;
 function toast(msg,tipo='ok'){const el=document.getElementById('toast'); if(!el) return; el.textContent=msg;el.className='toast '+tipo+' show';clearTimeout(_tTO);_tTO=setTimeout(()=>el.classList.remove('show'),3000);}
 
-// ── EVENTOS E EXPORTAÇÃO GLOBAL (CORREÇÃO PARA GITHUB) ───────────
+// ── EVENTOS E EXPORTAÇÃO GLOBAL ─────────────────────────────────
 window.entrar = entrar;
 window.sair = sair;
 window.navTo = navTo;
@@ -631,16 +642,25 @@ tbody tr:hover{background:rgba(74,168,90,.04)}tbody td{padding:12px 14px;color:v
         <div class="card-head"><div class="card-title">📝 Formulário de Registro</div></div>
         <div class="card-body">
           <div class="form-cad">
-            <div class="fg-d"><label>RA (Registro Acadêmico)</label><input type="text" id="cad-ra" placeholder="Ex: 221011"></div>
-            <div class="fg-d"><label>Nome Completo</label><input type="text" id="cad-nome" placeholder="Ex: Carlos Augusto"></div>
-            <div class="fg-d"><label>Período Atual</label>
-              <select id="cad-periodo">
-                <option>5º Período</option><option>6º Período</option><option>7º Período</option><option>8º Período</option>
-                <option>9º Período</option><option>10º Período</option><option>11º Período</option><option>12º Período</option>
-              </select>
+            <div class="fg-d" style="grid-column: span 2">
+                <label>Nome Completo</label>
+                <input type="text" id="cad-nome" placeholder="Ex: Carlos Augusto">
             </div>
-            <div class="fg-d"><label>Turma / Grupo</label><input type="text" id="cad-turma" placeholder="Ex: A, B, Manhã, Tarde"></div>
-            <div class="fg-d"><label>E-mail</label><input type="email" id="cad-email" placeholder="aluno@fmc.edu.br"></div>
+            <div class="fg-d">
+                <label>RA (Registro Acadêmico)</label>
+                <input type="text" id="cad-ra" placeholder="Ex: 221011">
+            </div>
+            <div class="fg-d">
+                <label>Período Atual</label>
+                <select id="cad-periodo">
+                    <option>5º Período</option><option>6º Período</option><option>7º Período</option><option>8º Período</option>
+                    <option>9º Período</option><option>10º Período</option><option>11º Período</option><option>12º Período</option>
+                </select>
+            </div>
+            <div class="fg-d" style="grid-column: span 2">
+                <label>E-mail</label>
+                <input type="email" id="cad-email" placeholder="aluno@fmc.edu.br">
+            </div>
           </div>
           <div style="margin-top:20px">
             <button class="btn btn-primary" id="btn-salvar-aluno" onclick="salvarAluno()" style="width:auto;padding:12px 28px">✅ Cadastrar Aluno</button>
