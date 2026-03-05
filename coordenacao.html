@@ -7,23 +7,26 @@
 <title>FMC · Coordenação de Medicina</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script type="module">
-import { initializeApp }   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, getDocs, addDoc,
-         query, where, orderBy, onSnapshot, Timestamp }
-  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, getDocs, addDoc, query, where, orderBy, onSnapshot, Timestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-const FB = { apiKey:"AIzaSyCTpK-m1xjzs27MJ0827GRpBrUaih_4wSg", authDomain:"caderneta-fmc.firebaseapp.com",
-             projectId:"caderneta-fmc", storageBucket:"caderneta-fmc.firebasestorage.app",
-             messagingSenderId:"739844114033", appId:"1:739844114033:web:bcc7234c924d0b13217dd0" };
+const FB = { 
+    apiKey:"AIzaSyCTpK-m1xjzs27MJ0827GRpBrUaih_4wSg", 
+    authDomain:"caderneta-fmc.firebaseapp.com",
+    projectId:"caderneta-fmc", 
+    storageBucket:"caderneta-fmc.firebasestorage.app",
+    messagingSenderId:"739844114033", 
+    appId:"1:739844114033:web:bcc7234c924d0b13217dd0" 
+};
 const app = initializeApp(FB);
 const db  = getFirestore(app);
 
 const TOTAL_PLANTOES = 20;
-const SENHA_COORD    = "fmc2026"; // ← altere aqui
+const SENHA_COORD    = "fmc2026"; 
 
 let dadosAlunos=[], dadosPlantoes=[], resumoAlunos=[], sortCol='nome', sortAsc=true;
 
-// ── LOGIN ─────────────────────────────────────────────────────
+// ── FUNÇÕES DE LOGIN ──
 function entrar(){
   if(document.getElementById('login-senha').value === SENHA_COORD){
     document.getElementById('screen-login').classList.remove('on');
@@ -34,44 +37,72 @@ function entrar(){
     document.getElementById('login-senha').focus();
   }
 }
-function sair(){
-  document.getElementById('screen-dash').classList.remove('on');
-  document.getElementById('screen-login').classList.add('on');
-  document.getElementById('login-senha').value='';
-}
-window.entrar=entrar; window.sair=sair;
+function sair(){ location.reload(); }
 
-// ── NAVEGAÇÃO ─────────────────────────────────────────────────
-function navTo(pageId,nav){
+// ── NAVEGAÇÃO ──
+function navTo(pageId, nav){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  document.getElementById(pageId).classList.add('on');
-  nav.classList.add('active');
+  document.querySelectorAll('.mnav-item').forEach(m=>m.classList.remove('active'));
+  
+  const targetPage = document.getElementById(pageId);
+  if(targetPage) targetPage.classList.add('on');
+  if(nav) nav.classList.add('active');
 }
-window.navTo = navTo;
+
+// Botão Voltar para Celular
+window.voltar = () => {
+    navTo('p-overview');
+    document.querySelector('.nav-item').classList.add('active');
+};
 
 function atualizarData(){
   const agora=new Date();
-  document.getElementById('sb-data').textContent=agora.toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'})+' · '+agora.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  const el = document.getElementById('sb-data');
+  if(el) el.textContent=agora.toLocaleDateString('pt-BR')+' · '+agora.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
 }
 
-// ── CARREGAR DADOS ────────────────────────────────────────────
+// ── CARREGAR DADOS (CORRIGIDO SEM ORDERBY) ──
 async function carregarDados(){
-  toast('Carregando dados do Firebase...','ok');
+  toast('Sincronizando...','ok');
   try {
     const [snapA, snapP] = await Promise.all([
       getDocs(collection(db,'alunos')),
-      getDocs(query(collection(db,'plantoes'), where('status','==','Confirmado'), orderBy('criadoEm'))),
+      getDocs(query(collection(db,'plantoes'), where('status','==','Confirmado'))) 
     ]);
+    
     dadosAlunos   = snapA.docs.map(d=>({id:d.id,...d.data()})).filter(a=>a.ra&&a.nome);
     dadosPlantoes = snapP.docs.map(d=>({id:d.id,...d.data()}));
+    
     processarDados(); renderOverview(); renderTabelaAlunos(); renderTabelaPlantoes(); renderAlertas();
-    toast('Dados atualizados!','ok');
   } catch(e){
-    toast('Erro ao carregar dados.','err'); console.error(e);
+    toast('Erro de conexão.','err');
+    console.error("Erro detalhado:", e);
   }
 }
+
+function processarDados(){
+  resumoAlunos = dadosAlunos.map(a=>{
+    const pls = dadosPlantoes.filter(p=>String(p.ra)===String(a.ra));
+    const n=pls.length, pct=Math.round(n/TOTAL_PLANTOES*100);
+    const st=n>=TOTAL_PLANTOES?'ok':pct>=50?'and':'atr';
+    return{...a, plantoes:n, pct, status:st, ultimo:pls[pls.length-1]||null};
+  });
+}
+
+// ── FUNÇÕES GLOBAIS (Obrigatório para os botões funcionarem) ──
+window.entrar = entrar;
+window.sair = sair;
+window.navTo = navTo;
 window.carregarDados = carregarDados;
+window.salvarAluno = salvarAluno;
+window.filtrarTabela = filtrarTabela;
+window.filtrarPlantoes = filtrarPlantoes;
+window.sortBy = sortBy;
+window.exportarPDF = () => window.print();
+window.toast = toast;
+
+// ... (Mantenha o restante das suas funções de renderização abaixo como já estavam) ...
 
 function processarDados(){
   resumoAlunos = dadosAlunos.map(a=>{
